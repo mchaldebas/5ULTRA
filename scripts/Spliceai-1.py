@@ -29,8 +29,8 @@ header = infile.readline().strip('\r\n')
 outfile.write(f"{header}\tSpliceAI\n")
 
 # Paths to SpliceAI VCF files (update these paths accordingly)
-snv_vcf_path = "/ru-auth/local/home/mchaldebas/scratch/uORF/databases/SpliceAI/precomputed/spliceai_scores.raw.snv.hg38.vcf.gz"
-indel_vcf_path = "/ru-auth/local/home/mchaldebas/scratch/uORF/databases/SpliceAI/precomputed/spliceai_scores.raw.indel.hg38.vcf.gz"
+snv_vcf_path = "./data/spliceai_scores.raw.snv.hg38.vcf.gz"
+indel_vcf_path = "./data/spliceai_scores.raw.indel.hg38.vcf.gz"
 
 # Open VCF files using pysam
 snv_vcf = pysam.TabixFile(snv_vcf_path)

@@ -3,12 +3,11 @@ import ast
 from math import nan
 from collections import defaultdict
 import sys
-import os
 import subprocess
 
 VARIANTS_FILE_PATH = sys.argv[1]
-UTR_FILE_PATH = '../tmp/45.analyzed.5UTRs.tsv'
-UORF_FILE_PATH = '../tmp/47.uORFs.tsv'
+UTR_FILE_PATH = '../data/5UTRs.tsv'
+UORF_FILE_PATH = '../data/uORFs.tsv'
 OUTPUT_FILE_PATH = sys.argv[2]
 BASE_PAIRING = {'A': 'T', 'T': 'A', 'G': 'C', 'C': 'G', 'N': 'N', '*': '*'}
 KOZAK_STRENGTH = {'Weak': 0, 'Adequate': 1, 'Strong': 2, '': nan}

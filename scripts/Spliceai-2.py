@@ -5,8 +5,8 @@ import ast
 
 # File paths
 VARIANTS_FILE_PATH = sys.argv[1]
-UTRS_FILE_PATH = '../tmp/45.analyzed.5UTRs.tsv'
-INTRONS_FILE_PATH = '../tmp/52.filtered-Introns.tsv'
+UTRS_FILE_PATH = './data/5UTRs.tsv'
+INTRONS_FILE_PATH = './data/52.filtered-Introns.tsv'
 OUTPUT_FILE_PATH = sys.argv[2]
 
 # Constants

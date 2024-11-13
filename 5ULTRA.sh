@@ -58,28 +58,28 @@ if [[ "$input_file" == *.gz ]]; then
 fi
 
 # Check if required scripts and files exist
-[ -f "Filter-vcf.py" ] || error_exit "Filter-vcf.py not found"
-[ -f "Detection.py" ] || error_exit "Detection.py not found"
-[ -f "Score.py" ] || error_exit "Score.py not found"
-[ -f "./Databases/5UTRs.intervals.bed" ] || error_exit "Database file './Databases/5UTRs.intervals.bed' not found"
+[ -f "./scripts/Filter-input.py" ] || error_exit "./scripts/Filter-input.py not found"
+[ -f "./scripts/Detection.py" ] || error_exit "./scripts/Detection.py not found"
+[ -f "./scripts/Score.py" ] || error_exit "./scripts/Score.py not found"
+[ -f "./data/5UTRs.intervals.bed" ] || error_exit "Database file './Databases/5UTRs.intervals.bed' not found"
 
 # Filter VCF/TSV data for 5'UTRs
 step_start_time=$(date +%s)
 filtered_output="$TMP_DIR/5UTR.${output##*/}.tsv"
-python3 Filter-vcf.py "$input_file" "./5UTRs.intervals.bed" > "$filtered_output"
+python3 ./scripts/Filter-input.py "$input_file" "./data/5UTRs.intervals.bed" > "$filtered_output"
 step_end_time=$(date +%s)
 print_execution_time "5'UTR filtering" $step_start_time $step_end_time
 
 # Run Detection
 step_start_time=$(date +%s)
 detection_output="$TMP_DIR/Detection.5UTR.${output##*/}.tsv"
-python3 Detection.py "$filtered_output" "$detection_output"
+python3 ./scripts/Detection.py "$filtered_output" "$detection_output"
 step_end_time=$(date +%s)
 print_execution_time "5'UTR detection" $step_start_time $step_end_time
 
 # Run Scoring
 step_start_time=$(date +%s)
-python3 Score.py "$detection_output" "$output_file"
+python3 ./scripts/Score.py "$detection_output" "$output_file"
 step_end_time=$(date +%s)
 print_execution_time "Scoring" $step_start_time $step_end_time
 

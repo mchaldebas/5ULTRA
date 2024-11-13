@@ -66,7 +66,7 @@ fi
 # Filter VCF/TSV data for 5'UTRs
 step_start_time=$(date +%s)
 filtered_output="$TMP_DIR/5UTR.${output##*/}.tsv"
-python3 Filter-vcf.py "$input_file" "./Databases/5UTRs.intervals.bed" > "$filtered_output"
+python3 Filter-vcf.py "$input_file" "./5UTRs.intervals.bed" > "$filtered_output"
 step_end_time=$(date +%s)
 print_execution_time "5'UTR filtering" $step_start_time $step_end_time
 

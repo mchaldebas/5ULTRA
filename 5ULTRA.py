@@ -50,24 +50,18 @@ def main():
     parser.add_argument('--splice', action='store_true', help='Enable SpliceAI processing')
     parser.add_argument('input_file', help='Input VCF/TSV file')
     parser.add_argument('output_file', nargs='?', help='Output TSV file (default: input_file with .tsv extension)')
-
     args = parser.parse_args()
-
     splice = args.splice
     input_file = args.input_file
     output_file = args.output_file
-
     # Assign default output file if not provided
     if not output_file:
         base, _ = os.path.splitext(input_file)
         output_file = f"{base}.tsv"
-
     # Check if input file exists
     check_file_exists(input_file, "Input file")
-
     # Record start time
     start_time_total = time.time()
-
     # Create temporary directory
     with tempfile.TemporaryDirectory(prefix="pipeline_tmp.") as tmp_dir:
         # Unzip input file if necessary
@@ -80,7 +74,6 @@ def main():
             input_file = unzipped_path
             end_time = time.time()
             print_execution_time("Unzipping input file", start_time, end_time)
-
         # Check required scripts and files
         required_scripts = [
             "./scripts/Filter-input.py",
@@ -91,7 +84,6 @@ def main():
 
         required_data_file = "./data/5UTRs.intervals.bed"
         check_file_exists(required_data_file, "Database file")
-
         # Filter VCF/TSV data for 5'UTRs
         start_time = time.time()
         filtered_output = os.path.join(tmp_dir, f"5UTR.{os.path.basename(output_file)}.tsv")
@@ -110,7 +102,6 @@ def main():
                 error_exit(f"Script not found: {' '.join(filter_command)}")
         end_time = time.time()
         print_execution_time("5'UTR filtering", start_time, end_time)
-
         # Conditional SpliceAI Processing
         if splice:
             spliceai_script = "./scripts/Spliceai-Main.py"
@@ -142,7 +133,6 @@ def main():
             end_time = time.time()
             print_execution_time("5'UTR detection", start_time, end_time)
             scoring_input = detection_output
-
         # Run Scoring
         score_script = "./scripts/Score.py"
         score_command = [
@@ -155,7 +145,6 @@ def main():
         run_subprocess(score_command, "Score.py")
         end_time = time.time()
         print_execution_time("Scoring", start_time, end_time)
-
     # Calculate and print total execution time
     end_time_total = time.time()
     total_time = int(end_time_total - start_time_total)

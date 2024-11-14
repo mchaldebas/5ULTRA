@@ -26,19 +26,23 @@
 ### Prerequisites
 - Operating System: Linux or macOS
 - Software:
- - Python 3.x
- - Bash shell
- - tabix utility
+    - Python 3.x
+    - Bash shell
+    - tabix utility
 - Python Packages:
- - pandas
- - numpy
- - joblib
+    - pandas
+    - numpy
+    - joblib
 ### Steps
 1. Clone the Repository:
+```
 git clone https://github.com/yourusername/5ULTRA.git
 cd 5ULTRA
+```
 2. Install Python Dependencies:
+```
 pip install pandas numpy joblib
+```
 3. Ensure Data Files Are in Place:
     - Place 5UTRs.intervals.bed, 5UTRs.tsv, and uORFs.tsv in the ./data directory.
     - Ensure PhyloP and PhastCons score files are available and indexed with tabix.
@@ -60,15 +64,21 @@ bash 5ULTRA.sh input_variants.vcf
 ```
 bash 5ULTRA.sh --splice input_variants.vcf annotated_variants.tsv
 ```
-## Input and Output
+## Input and Output File Format
 
-- Input: VCF or TSV file with genetic variants.
-- Output: TSV file containing annotated and scored variants, including details such as:
-Variant information (chromosome, position, reference, alternate allele).
-Annotation details (CSQ, translation impact).
-uORF annotations (type, length, Kozak strength).
-SpliceAI scores (if enabled).
-Calculated 5ULTRA_Score.
+***Input***: VCF or TSV file with genetic variants.
+***Output***: TSV file containing annotated and scored variants.
+
+- CHROM, POS, ID, REF, ALT (exactly the same as input)
+- CSQ
+- GENE
+- CDS translation
+- 5ULTRA_Score
+ 
+
+## Reference
+
+***Chaldebas M. et al.*** Genome-wide detection of human 5’UTR candidate variants. 2025.
 
 ## Contributing
 

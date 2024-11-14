@@ -16,8 +16,8 @@
 1. Input Preparation: Accepts VCF or TSV files containing genetic variants.
 2. 5' UTR Filtering: Utilizes Filter-input.py to filter variants within 5' UTR regions based on provided intervals.
 3. Variant Detection:
- - If SpliceAI is not enabled, runs Detection.py to annotate variants affecting uORFs and Kozak sequences.
- - If SpliceAI is enabled, executes Spliceai-Main.sh for splicing impact analysis.
+- If SpliceAI is not enabled, runs Detection.py to annotate variants affecting uORFs and Kozak sequences.
+- If SpliceAI is enabled, executes Spliceai-Main.sh for splicing impact analysis.
 4. Scoring: Applies Score.py to compute a variant score using a pre-trained machine learning model.
 5. Output Generation: Produces a TSV file with annotated and scored variants.
 
@@ -44,9 +44,9 @@ pip install pandas numpy joblib
  - Ensure PhyloP and PhastCons score files are available and indexed with tabix.
 
 ## Usage
-
+'''
 bash 5ULTRA.sh [--splice] <input_file> [output_file]
-
+'''
 ### Options
 - --splice: Enable SpliceAI processing for splicing impact analysis.
 - <input_file>: Path to the input VCF or TSV file containing genetic variants.

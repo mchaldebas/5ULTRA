@@ -53,7 +53,7 @@ python 5ULTRA.py [--splice] <input_file> [output_file]
 ### Options
 - --splice: Enable SpliceAI processing for splicing impact analysis.
 - <input_file>: Path to the input VCF or TSV file containing genetic variants.
-- [output_file]: (Optional) Path for the output TSV file. Defaults to <input_file>.tsv if not specified.
+- [output_file]: (Optional) Path for the output TSV file. Defaults to <input_file>.5ULTRA.tsv if not specified.
 ### Examples
 #### Basic Usage
 ```

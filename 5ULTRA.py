@@ -57,7 +57,7 @@ def main():
     # Assign default output file if not provided
     if not output_file:
         base, _ = os.path.splitext(input_file)
-        output_file = f"{base}.tsv"
+        output_file = f"{base}.5ULTRA.tsv"
     # Check if input file exists
     check_file_exists(input_file, "Input file")
     # Record start time

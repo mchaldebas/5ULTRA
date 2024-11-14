@@ -16,8 +16,8 @@
 1. Input Preparation: Accepts VCF or TSV files containing genetic variants.
 2. 5' UTR Filtering: Utilizes Filter-input.py to filter variants within 5' UTR regions based on provided intervals.
 3. Variant Detection:
-- If SpliceAI is not enabled, runs Detection.py to annotate variants affecting uORFs and Kozak sequences.
-- If SpliceAI is enabled, executes Spliceai-Main.sh for splicing impact analysis.
+    - If SpliceAI is not enabled, runs Detection.py to annotate variants affecting uORFs and Kozak sequences.
+    - If SpliceAI is enabled, executes Spliceai-Main.sh for splicing impact analysis.
 4. Scoring: Applies Score.py to compute a variant score using a pre-trained machine learning model.
 5. Output Generation: Produces a TSV file with annotated and scored variants.
 
@@ -40,8 +40,8 @@ cd 5ULTRA
 2. Install Python Dependencies:
 pip install pandas numpy joblib
 3. Ensure Data Files Are in Place:
- - Place 5UTRs.intervals.bed, 5UTRs.tsv, and uORFs.tsv in the ./data directory.
- - Ensure PhyloP and PhastCons score files are available and indexed with tabix.
+    - Place 5UTRs.intervals.bed, 5UTRs.tsv, and uORFs.tsv in the ./data directory.
+    - Ensure PhyloP and PhastCons score files are available and indexed with tabix.
 
 ## Usage
 ```
@@ -52,11 +52,14 @@ bash 5ULTRA.sh [--splice] <input_file> [output_file]
 - <input_file>: Path to the input VCF or TSV file containing genetic variants.
 - [output_file]: (Optional) Path for the output TSV file. Defaults to <input_file>.tsv if not specified.
 ### Examples
-#### Basic Usage without SpliceAI
+#### Basic Usage
+```
 bash 5ULTRA.sh input_variants.vcf
-#### Usage with SpliceAI Integration
+```
+#### Usage with SpliceAI Integration to look only at splicing variants
+```
 bash 5ULTRA.sh --splice input_variants.vcf annotated_variants.tsv
-
+```
 ## Input and Output
 
 - Input: VCF or TSV file with genetic variants.

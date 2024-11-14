@@ -106,7 +106,6 @@ fi
 # Check if required scripts and files exist
 REQUIRED_SCRIPTS=(
     "./scripts/Filter-input.py"
-    "./scripts/Detection.py"
     "./scripts/Score.py"
 )
 for script in "${REQUIRED_SCRIPTS[@]}"; do
@@ -124,7 +123,6 @@ print_execution_time "5'UTR filtering" "$step_start_time" "$step_end_time"
 
 # Conditional SpliceAI Processing
 if $splice; then
-    echo "SpliceAI processing enabled."
     # Define the path to Spliceai-Main.sh
     spliceai_script="./scripts/Spliceai-Main.sh"
     # Check if Spliceai-Main.sh exists
@@ -140,10 +138,13 @@ if $splice; then
     # Set the input for Scoring
     scoring_input="$spliceai_output"
 else
+    Detection_script="./scripts/Detection.py"
+    # Check if Spliceai-Main.sh exists
+    [[ -f "$Detection_script" ]] || error_exit "Script not found: $Detection_script"
     # Run Detection
     step_start_time=$(date +%s)
     detection_output="$TMP_DIR/Detection.5UTR.${output_file##*/}.tsv"
-    python3 ./scripts/Detection.py "$filtered_output" "$detection_output"
+    python3 "$Detection_script" "$filtered_output" "$detection_output"
     step_end_time=$(date +%s)
     print_execution_time "5'UTR detection" "$step_start_time" "$step_end_time"
     # Set the input for Scoring

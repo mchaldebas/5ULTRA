@@ -27,8 +27,6 @@
 - Operating System: Linux or macOS
 - Software:
     - Python 3.x
-    - Bash shell
-    - tabix utility
 - Python Packages:
     - pysam
     - pandas
@@ -50,7 +48,7 @@ pip install pandas numpy joblib
 
 ## Usage
 ```
-bash 5ULTRA.sh [--splice] <input_file> [output_file]
+python 5ULTRA.py [--splice] <input_file> [output_file]
 ```
 ### Options
 - --splice: Enable SpliceAI processing for splicing impact analysis.
@@ -59,11 +57,11 @@ bash 5ULTRA.sh [--splice] <input_file> [output_file]
 ### Examples
 #### Basic Usage
 ```
-bash 5ULTRA.sh input_variants.vcf
+python 5ULTRA.py input_variants.vcf
 ```
 #### Usage with SpliceAI Integration to look only at splicing variants
 ```
-bash 5ULTRA.sh --splice input_variants.vcf annotated_variants.tsv
+python 5ULTRA.py --splice input_variants.vcf annotated_variants.tsv
 ```
 ## Input and Output File Format
 

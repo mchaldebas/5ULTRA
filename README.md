@@ -30,6 +30,7 @@
     - Bash shell
     - tabix utility
 - Python Packages:
+    - pysam
     - pandas
     - numpy
     - joblib

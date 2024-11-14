@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
 import sys
-import shutil
 import gzip
 from pathlib import Path
 import subprocess

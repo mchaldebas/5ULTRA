@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e  # Exit immediately if a command exits with a non-zero status
+set -e
 
 # Function to print error messages and exit
 error_exit() {
@@ -123,23 +123,23 @@ print_execution_time "5'UTR filtering" "$step_start_time" "$step_end_time"
 
 # Conditional SpliceAI Processing
 if $splice; then
-    # Define the path to Spliceai-Main.sh
-    spliceai_script="./scripts/Spliceai-Main.sh"
-    # Check if Spliceai-Main.sh exists
+    # Define the path to Spliceai-Main.py
+    spliceai_script="./scripts/Spliceai-Main.py"
+    # Check if Spliceai-Main.py exists
     [[ -f "$spliceai_script" ]] || error_exit "Script not found: $spliceai_script"
-    # Define the output file for Spliceai-Main.sh
+    # Define the output file for Spliceai-Main.py
     spliceai_output="$TMP_DIR/Spliceai.${output_file##*/}.tsv"
-    # Run Spliceai-Main.sh
+    # Run Spliceai-Main.py
     step_start_time=$(date +%s)
-    echo "Running Spliceai-Main.sh on detection output..."
+    echo "Running Spliceai-Main.py on detection output..."
     bash "$spliceai_script" --input "$filtered_output" --output "$spliceai_output"
     step_end_time=$(date +%s)
-    print_execution_time "Spliceai-Main.sh" "$step_start_time" "$step_end_time"
+    print_execution_time "Spliceai-Main.py" "$step_start_time" "$step_end_time"
     # Set the input for Scoring
     scoring_input="$spliceai_output"
 else
     Detection_script="./scripts/Detection.py"
-    # Check if Spliceai-Main.sh exists
+    # Check if Detection.py exists
     [[ -f "$Detection_script" ]] || error_exit "Script not found: $Detection_script"
     # Run Detection
     step_start_time=$(date +%s)

@@ -44,9 +44,9 @@ pip install pandas numpy joblib
  - Ensure PhyloP and PhastCons score files are available and indexed with tabix.
 
 ## Usage
-'''
+```
 bash 5ULTRA.sh [--splice] <input_file> [output_file]
-'''
+```
 ### Options
 - --splice: Enable SpliceAI processing for splicing impact analysis.
 - <input_file>: Path to the input VCF or TSV file containing genetic variants.

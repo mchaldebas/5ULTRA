@@ -11,7 +11,7 @@ usage() {
 # Default values
 input_file=""
 output_file=""
-intervals="../tmp/45.analyzed.5UTRs.merged.bed"
+intervals="./data/5UTRs.intervals.bed"
 
 # Parse command-line arguments
 POSITIONAL=()

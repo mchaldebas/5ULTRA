@@ -9,7 +9,7 @@
 - 5' UTR Filtering: Filters input variant files to retain only those variants located within 5' UTR regions.
 - Variant Annotation: Detects and annotates variants that impact uORFs, including uStart gains/losses, uStop gains/losses, and Kozak sequence alterations.
 - SpliceAI Integration: Optionally incorporates SpliceAI predictions to assess the impact of variants on splicing.
-- Scoring System: Calculates a comprehensive score for each variant based on machine learning models, aiding in the interpretation of potential pathogenicity.
+- Scoring: Calculates a comprehensive score for each variant based on a reandom forest model, aiding in the interpretation of potential effect on CDS translation.
 
 ## Pipeline Workflow
 

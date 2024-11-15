@@ -81,7 +81,7 @@ def main():
             spliceai_output
         ]
         start_time = time.time()
-        print("Running Spliceai-2.py on filtering output...")
+        print("Running Spliceai-2.py on Spliceai-1 output...")
         run_subprocess(spliceai_command, "Spliceai-2.py")
         end_time = time.time()
         print_execution_time("Spliceai-2.py", start_time, end_time)
@@ -96,7 +96,7 @@ def main():
             spliceai_output
         ]
         start_time = time.time()
-        print("Running Spliceai-3.py on filtering output...")
+        print("Running Spliceai-3.py on Spliceai-2 output...")
         run_subprocess(spliceai_command, "Spliceai-3.py")
         end_time = time.time()
         print_execution_time("Spliceai-3.py", start_time, end_time)

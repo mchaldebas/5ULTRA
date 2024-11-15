@@ -74,6 +74,16 @@ python 5ULTRA.py --splice input_variants.vcf annotated_variants.tsv
     - GENE
     - CDS translation
     - 5ULTRA_Score
+- ***Full Annotation***:
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
 
 ## Reference
 

@@ -41,7 +41,7 @@ cd 5ULTRA
 ```
 2. Install Python Dependencies:
 ```
-pip install pandas numpy joblib
+pip install pysam pandas numpy joblib sklearn
 ```
 3. Ensure Data Files Are in Place:
     - Place 5UTRs.intervals.bed, 5UTRs.tsv, and uORFs.tsv in the ./data directory.

@@ -32,6 +32,7 @@
     - pandas
     - numpy
     - joblib
+    - sklearn
 ### Steps
 1. Clone the Repository:
 ```

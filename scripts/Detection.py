@@ -5,11 +5,11 @@ import ast
 from math import nan
 from collections import defaultdict
 import sys
-import subprocess
+import pysam
 
 VARIANTS_FILE_PATH = sys.argv[1]
-UTR_FILE_PATH = '../data/5UTRs.tsv'
-UORF_FILE_PATH = '../data/uORFs.tsv'
+UTR_FILE_PATH = './data/5UTRs.tsv'
+UORF_FILE_PATH = './data/uORFs.tsv'
 OUTPUT_FILE_PATH = sys.argv[2]
 BASE_PAIRING = {'A': 'T', 'T': 'A', 'G': 'C', 'C': 'G', 'N': 'N', '*': '*'}
 KOZAK_STRENGTH = {'Weak': 0, 'Adequate': 1, 'Strong': 2, '': nan}
@@ -104,11 +104,16 @@ def calculate_kozak_strength(kozak_sequence):
 
 def get_score(chrom, pos, file_path):
     try:
-        result = subprocess.check_output(
-            f"tabix {file_path} {chrom}:{pos}-{pos}", shell=True).decode('utf-8').strip()
-        if result:
-            return result.split('\t')[-1]  # Assuming score is in the last column
-    except subprocess.CalledProcessError:
+        # Open the tabix-indexed file
+        tabix_file = pysam.TabixFile(file_path)
+        # Fetch the region for the specified chromosome and position
+        records = tabix_file.fetch(chrom, pos - 1, pos)
+        for record in records:
+            # Assuming the score is in the last column
+            return record.split('\t')[-1]
+        return None  # Return None if no records are found
+    except (OSError, ValueError, KeyError, pysam.TabixError) as e:
+        # Handle errors
         return None
 
 # function for annotation of created uORF (uStart gain)
@@ -141,18 +146,18 @@ def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR)
         pos1, pos2, pos3 = uORF_START, uORF_START - 1, uORF_START - 2
     # Get Phylop scores for the 3 nucleotides
     phyloP_scores = [
-        get_score(CHR, pos1, "./Databases/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos2, "./Databases/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos3, "./Databases/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR))
+        get_score(CHR, pos1, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos2, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos3, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR))
     ]
     # Calculate mean Phylop score
     phyloP_scores = [float(score) for score in phyloP_scores if score and (score.replace('.', '', 1).replace('-', '', 1).isdigit())]
     mean_phylop = sum(phyloP_scores) / len(phyloP_scores) if phyloP_scores else "NA"
     # Get PhastCons scores for the 3 nucleotides
     phastCons_scores = [
-        get_score(CHR, pos1, "./Databases/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos2, "./Databases/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos3, "./Databases/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR))
+        get_score(CHR, pos1, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos2, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos3, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR))
     ]
     # Calculate mean PhastCons score
     phastCons_scores = [float(score) for score in phastCons_scores if score and score.replace('.', '', 1).isdigit()]
@@ -205,11 +210,11 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript):
                 if KOZAK_STRENGTH[newKOZAK_STRENGTH] < KOZAK_STRENGTH[UTR[11]]:
                     CSQ[0].extend(['mKozak'])
                     CSQ[1].extend(['decreased'])
-                    uORFAnnotations += [['']*16]
+                    uORFAnnotations += [['']*15]
                 if KOZAK_STRENGTH[newKOZAK_STRENGTH] > KOZAK_STRENGTH[UTR[11]]:
                     CSQ[0].extend(['mKozak'])
                     CSQ[1].extend(['increased'])
-                    uORFAnnotations += [['']*16]
+                    uORFAnnotations += [['']*15]
         # uStart gain
         if 'ATG' in mutatedSequence[relativePosition-2: relativePosition+len(ALT)+2] and 'ATG' not in wtSEQ[ relativePosition-2: relativePosition+len(REF)+2]:
             CSQ[0].extend(['uStart_gain'])

@@ -141,54 +141,24 @@ def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR)
         pos1, pos2, pos3 = uORF_START, uORF_START - 1, uORF_START - 2
     # Get Phylop scores for the 3 nucleotides
     phyloP_scores = [
-        get_score(CHR, pos1, "../databases/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos2, "../databases/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos3, "../databases/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR))
+        get_score(CHR, pos1, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos2, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos3, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR))
     ]
     # Calculate mean Phylop score
     phyloP_scores = [float(score) for score in phyloP_scores if score and (score.replace('.', '', 1).replace('-', '', 1).isdigit())]
     mean_phylop = sum(phyloP_scores) / len(phyloP_scores) if phyloP_scores else "NA"
     # Get PhastCons scores for the 3 nucleotides
     phastCons_scores = [
-        get_score(CHR, pos1, "../databases/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos2, "../databases/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos3, "../databases/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR))
+        get_score(CHR, pos1, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos2, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos3, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR))
     ]
     # Calculate mean PhastCons score
     phastCons_scores = [float(score) for score in phastCons_scores if score and score.replace('.', '', 1).isdigit()]
     mean_phastcons = sum(phastCons_scores) / len(phastCons_scores) if phastCons_scores else "NA"
     uORF_END = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_END)
     return [uORF_START, uORF_END, '000', uSTART_mSTART_DIST, 'ATG', uSTOP_CODON, uORF_TYPE, uKOZAK, uKOZAK_STRENGTH, uORF_LENGTH, uORF_LENGTH/3, uORF_SEQ, uORF_rank, mean_phylop, mean_phastcons]
-
-def ULTRA_Score(CSQ, uKozak_strength, PhyloP, PhastCons, uORF_TYPE, uStop_codon, uORF_count):
-    score = 0
-    if CSQ in ["uStart_gain", "uStart_loss", "uKozak"]:
-        if (is_valid_number(PhyloP) and float(PhyloP) > 2) or (is_valid_number(PhastCons) and float(PhastCons) > 0.5):
-            score += 2
-        elif (is_valid_number(PhyloP) and float(PhyloP) > 0) or (is_valid_number(PhastCons) and float(PhastCons) > 0.3):
-            score += 1
-        if uKozak_strength in ["Strong", "Adequate"] or CSQ == "uKozak":
-            score += 1
-        if uORF_TYPE == "Overlapping":
-            score += 1
-        elif uORF_TYPE == "Non-Overlapping" and uStop_codon != 'TGA':
-            score += 1
-        if float(uORF_count) <= 1:
-            score += 1
-        return score
-    if (is_valid_number(PhyloP) and float(PhyloP) > 2) or (is_valid_number(PhastCons) and float(PhastCons) > 0.5):
-        score += 2
-    elif (is_valid_number(PhyloP) and float(PhyloP) > 0) or (is_valid_number(PhastCons) and float(PhastCons) > 0.3):
-        score += 1
-    if uKozak_strength in ["Strong", "Adequate"]:
-        score += 1
-    if " to " in CSQ:
-        score += 1
-    elif uStop_codon != "TGA > TGA" and "TGA" in uStop_codon:
-        score += 1
-    if float(uORF_count) <= 1:
-        score += 1
-    return score
 
 def process_variant(variant, utrs_by_transcript, uorfs_by_transcript):
     if not variant[1].isdigit():
@@ -230,17 +200,15 @@ def process_variant(variant, utrs_by_transcript, uorfs_by_transcript):
                 if KOZAK_STRENGTH[newKOZAK_STRENGTH] < KOZAK_STRENGTH[UTR[11]]:
                     CSQ[0].extend(['mKozak'])
                     CSQ[1].extend(['decreased'])
-                    uORFAnnotations += [['']*16]
+                    uORFAnnotations += [['']*15]
                 if KOZAK_STRENGTH[newKOZAK_STRENGTH] > KOZAK_STRENGTH[UTR[11]]:
                     CSQ[0].extend(['mKozak'])
                     CSQ[1].extend(['increased'])
-                    uORFAnnotations += [['']*16]
+                    uORFAnnotations += [['']*15]
         # uStart gain
         if 'ATG' in mutatedSequence[relativePosition-2: relativePosition+len(ALT)+2] and 'ATG' not in wtSEQ[ relativePosition-2: relativePosition+len(REF)+2]:
             CSQ[0].extend(['uStart_gain'])
             Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR)
-            score = ULTRA_Score('uStart_gain', Anno[8], Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-            Anno.extend([score])
             uORFAnnotations += [Anno]
             if uORFAnnotations[-1][6] != 'N-terminal extension':
                 CSQ[1].extend(['decreased'])
@@ -267,8 +235,6 @@ def process_variant(variant, utrs_by_transcript, uorfs_by_transcript):
                         CSQ[0].extend(['uStart_loss'])
                         CSQ[1].extend(['increased'])
                         Anno = uORF[1:3] + [uORF[4]] + uORF[17:-4] + uORF[-3:]
-                        score = ULTRA_Score('uStart_loss', Anno[8], Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                        Anno.extend([score])
                         uORFAnnotations += [Anno]
                         continue
                     # scan frame for STOP then uStop gain & uStop loss
@@ -281,23 +247,17 @@ def process_variant(variant, utrs_by_transcript, uorfs_by_transcript):
                             CSQ[0].extend(['uStop_gain to Non-Overlapping'])
                             CSQ[1].extend(['increased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
-                            score = ULTRA_Score('uStop_gain to Non-Overlapping', Anno[8], Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                            Anno.extend([score])
                             uORFAnnotations += [Anno]
                             continue
                         elif uORF[20] == 'N-terminal extension':
                             CSQ[0].extend(['uStop_gain to Non-Overlapping'])
                             CSQ[1].extend(['decreased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
-                            score = ULTRA_Score('uStop_gain to Non-Overlapping', Anno[8], Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                            Anno.extend([score])
                             uORFAnnotations += [Anno]
                         else:
                             CSQ[0].extend(['uStop_gain shorter Non-Overlapping'])
                             CSQ[1].extend(['increased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
-                            score = ULTRA_Score('uStop_gain shorter Non-Overlapping', Anno[8], Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                            Anno.extend([score])
                             uORFAnnotations += [Anno]
                             continue
                     if codon > uSTOP and uORF[20] == 'Non-Overlapping':
@@ -305,22 +265,16 @@ def process_variant(variant, utrs_by_transcript, uorfs_by_transcript):
                             CSQ[0].extend(['uStop_loss to N-terminal extension'])
                             CSQ[1].extend(['N-terminal extension'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
-                            score = ULTRA_Score('uStop_loss to N-terminal extension', Anno[8], Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                            Anno.extend([score])
                             uORFAnnotations += [Anno]
                         elif codon +2 > startPOS:
                             CSQ[0].extend(['uStop_loss to Overlapping'])
                             CSQ[1].extend(['decreased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
-                            score = ULTRA_Score('uStop_loss to Overlapping', Anno[8], Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                            Anno.extend([score])
                             uORFAnnotations += [Anno]
                         else:
                             CSQ[0].extend(['uStop_loss longer Non-Overlapping'])
                             CSQ[1].extend(['decreased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
-                            score = ULTRA_Score('uStop_loss longer Non-Overlapping', Anno[8], Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                            Anno.extend([score])
                             uORFAnnotations += [Anno]
                     if uSTART -1 == relativePosition or relativePosition == uSTART -3 or relativePosition == uSTART +3:
                         newKOZAK = mutatedSequence[uSTART -4 :uSTART +5]
@@ -331,15 +285,11 @@ def process_variant(variant, utrs_by_transcript, uorfs_by_transcript):
                             CSQ[0].extend(['uKozak'])
                             CSQ[1].extend(['increased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:-4] + uORF[-3:]
-                            score = ULTRA_Score('uKozak', 'Strong', Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                            Anno.extend([score])
                             uORFAnnotations += [Anno]
                         elif KOZAK_STRENGTH[newKOZAK_STRENGTH] > KOZAK_STRENGTH[uORF[22]]:
                             CSQ[0].extend(['uKozak'])
                             CSQ[1].extend(['decreased'])
                             Anno= uORF[1:3] + [uORF[4]] + uORF[17:-4] + uORF[-3:]
-                            score = ULTRA_Score('uKozak', 'Strong', Anno[13], Anno[14], Anno[6], Anno[5], UTR[14])
-                            Anno.extend([score])
                             uORFAnnotations += [Anno]
         count = 0
         for hit in CSQ[0]:
@@ -366,7 +316,7 @@ def main():
     uORFs = uORFs[0]
     with open(OUTPUT_FILE_PATH, 'w') as f:
         write = csv.writer(f, delimiter='\t')
-        fields = variants[0][:-4] + ['SpliceAI', 'variant_type', 'CSQ', 'translation'] + UTRs[1:12] + UTRs[14:] + uORFs[1:3] + [uORFs[4]] + uORFs[17:-4] + uORFs[-3:] + ['5ULTRA_Score']
+        fields = variants[0][:-4] + ['SpliceAI', 'variant_type', 'CSQ', 'translation'] + UTRs[1:12] + UTRs[14:] + uORFs[1:3] + [uORFs[4]] + uORFs[17:-4] + uORFs[-3:]
         write.writerow(fields)
         for variant in variants[1:]:
             if ',' in variant[4]:

@@ -106,11 +106,11 @@ def main():
         if splice:
             spliceai_script = "./scripts/Spliceai-Main.py"
             check_file_exists(spliceai_script, "Script")
-            spliceai_output = os.path.join(tmp_dir, f"Spliceai.{os.path.basename(output_file)}.tsv")
-            spliceai_command = [
+            spliceai_output = os.path.join(tmp_dir, f"Spliceai.{os.path.basename(output_file)}")
+            spliceai_command = [ sys.executable,
                 spliceai_script,
-                "--input", filtered_output,
-                "--output", spliceai_output
+                filtered_output,
+                spliceai_output
             ]
             start_time = time.time()
             print("Running Spliceai-Main.py on detection output...")
@@ -121,7 +121,7 @@ def main():
         else:
             detection_script = "./scripts/Detection.py"
             check_file_exists(detection_script, "Script")
-            detection_output = os.path.join(tmp_dir, f"Detection.5UTR.{os.path.basename(output_file)}.tsv")
+            detection_output = os.path.join(tmp_dir, f"Detection.5UTR.{os.path.basename(output_file)}")
             detection_command = [
                 sys.executable, detection_script,
                 filtered_output,

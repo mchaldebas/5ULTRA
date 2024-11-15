@@ -70,11 +70,11 @@ python 5ULTRA.py --splice input_variants.vcf annotated_variants.tsv
 - ***Output***: TSV file containing annotated and scored variants.
 
     - CHROM, POS, ID, REF, ALT (exactly the same as input)
-    - CSQ
-    - GENE
-    - CDS translation
-    - 5ULTRA_Score
-- ***Full Annotation***:
+    - CSQ: 
+    - GENE: Gene Symbol
+    - CDS translation: Increased, Decreased, or N-terminal Extension
+    - 5ULTRA_Score: 
+- ***Full Annotation***: Additional columns in the output when --full specified
     - 
     - 
     - 

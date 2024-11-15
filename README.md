@@ -49,20 +49,21 @@ pip install pysam pandas numpy joblib sklearn
 
 ## Usage
 ```
-python 5ULTRA.py [--splice] <input_file> [output_file]
+python 5ULTRA.py [--splice] [--full] <input_file> [output_file]
 ```
 ### Options
-- --splice: Enable SpliceAI processing for splicing impact analysis.
 - <input_file>: Path to the input VCF or TSV file containing genetic variants.
 - [output_file]: (Optional) Path for the output TSV file. Defaults to <input_file>.5ULTRA.tsv if not specified.
+- --splice: Enable SpliceAI processing for splicing impact analysis.
+- --full: Get the Full annotation in the output.
 ### Examples
 #### Basic Usage
 ```
-python 5ULTRA.py input_variants.vcf
+python 5ULTRA.py test-variants.tsv
 ```
-#### Usage with SpliceAI Integration to look only at splicing variants
+#### Usage with all Arguments
 ```
-python 5ULTRA.py --splice input_variants.vcf annotated_variants.tsv
+python 5ULTRA.py --splice --full test-variants.tsv fully_annotated_variants.tsv
 ```
 ## Input and Output File Format
 

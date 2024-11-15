@@ -74,7 +74,7 @@ python 5ULTRA.py --splice --full test-variants.tsv fully_annotated_variants.tsv
     - GENE: Gene Symbol
     - CDS translation: Increased, Decreased, or N-terminal Extension
     - 5ULTRA_Score: 
-    - [Splice]: tag for splicing variants that may affect 5’UTR (spliceAI-embeded)
+    - [Splice]: Tag for splicing variants that may affect 5’UTR (spliceAI-embeded)
 - ***Full Annotation***: Additional columns in the output when --full specified
     - test
     - test

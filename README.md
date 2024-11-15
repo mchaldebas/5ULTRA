@@ -14,9 +14,9 @@
 ## Pipeline Workflow
 
 1. Input Preparation: Accepts VCF or TSV files containing genetic variants.
-2. 5' UTR Filtering: Utilizes Filter-input.py to filter variants within 5' UTR regions based on provided intervals.
+2. 5' UTR Filtering: Filter-input.py filters for variants within 5' UTR regions based on intervals.
 3. Variant Detection:
-    - If SpliceAI is not enabled, runs Detection.py to annotate variants affecting uORFs and Kozak sequences.
+    - Detection.py annotates variants affecting uORFs and Kozak sequences.
     - If SpliceAI is enabled, executes Spliceai-Main.sh for splicing impact analysis.
 4. Scoring: Applies Score.py to compute a variant score using a pre-trained machine learning model.
 5. Output Generation: Produces a TSV file with annotated and scored variants.

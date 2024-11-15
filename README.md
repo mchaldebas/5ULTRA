@@ -36,7 +36,7 @@
 ### Steps
 1. Clone the Repository:
 ```
-git clone https://github.com/yourusername/5ULTRA.git
+git clone https://github.com/mchaldebas/5ULTRA.git
 cd 5ULTRA
 ```
 2. Install Python Dependencies:
@@ -74,7 +74,6 @@ python 5ULTRA.py --splice input_variants.vcf annotated_variants.tsv
 - GENE
 - CDS translation
 - 5ULTRA_Score
- 
 
 ## Reference
 

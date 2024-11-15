@@ -66,14 +66,14 @@ python 5ULTRA.py --splice input_variants.vcf annotated_variants.tsv
 ```
 ## Input and Output File Format
 
-***Input***: VCF or TSV file with genetic variants.
-***Output***: TSV file containing annotated and scored variants.
+- ***Input***: VCF or TSV file with genetic variants.
+- ***Output***: TSV file containing annotated and scored variants.
 
-- CHROM, POS, ID, REF, ALT (exactly the same as input)
-- CSQ
-- GENE
-- CDS translation
-- 5ULTRA_Score
+    - CHROM, POS, ID, REF, ALT (exactly the same as input)
+    - CSQ
+    - GENE
+    - CDS translation
+    - 5ULTRA_Score
 
 ## Reference
 

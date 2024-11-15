@@ -75,15 +75,15 @@ python 5ULTRA.py --splice input_variants.vcf annotated_variants.tsv
     - CDS translation: Increased, Decreased, or N-terminal Extension
     - 5ULTRA_Score: 
 - ***Full Annotation***: Additional columns in the output when --full specified
-    - 
-    - 
-    - 
-    - 
-    - 
-    - 
-    - 
-    - 
-    - 
+    - test
+    - test
+    - test
+    - test
+    - test
+    - test
+    - test
+    - test
+    - test
 
 ## Reference
 

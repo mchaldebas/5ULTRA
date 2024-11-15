@@ -69,12 +69,12 @@ python 5ULTRA.py --splice --full test-variants.tsv fully_annotated_variants.tsv
 
 - ***Input***: VCF or TSV file with genetic variants.
 - ***Output***: TSV file containing annotated and scored variants.
-
     - CHROM, POS, ID, REF, ALT (exactly the same as input)
     - CSQ: 
     - GENE: Gene Symbol
     - CDS translation: Increased, Decreased, or N-terminal Extension
     - 5ULTRA_Score: 
+    - [Splice]: tag for splicing variants that may affect 5’UTR (spliceAI-embeded)
 - ***Full Annotation***: Additional columns in the output when --full specified
     - test
     - test

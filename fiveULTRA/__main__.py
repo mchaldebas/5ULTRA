@@ -71,7 +71,7 @@ def main():
             logging.info(f"Unzipping input file execution time:\t {int(end_time - start_time)} seconds")
 
         # Paths to scripts and data
-        required_data_file = os.path.join(data_dir, '5UTRs.intervals.bed')
+        required_data_file = os.path.join(os.path.expanduser(data_dir), '5UTRs.intervals.bed')
         if not os.path.isfile(required_data_file):
             logging.error(f"Database file '{required_data_file}' not found.")
             sys.exit(1)

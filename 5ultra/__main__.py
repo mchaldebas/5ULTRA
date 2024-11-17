@@ -2,11 +2,18 @@ import sys
 import argparse
 import logging
 import os
-import subprocess
 import tempfile
 import gzip
 import shutil
 import time
+
+from .scripts.filter_input import filter_input
+from .scripts.detection import process_variants, load_vcf_data, load_tsv_data
+from .scripts.score import score_variants
+from .scripts.spliceai1 import process_spliceai_1
+from .scripts.spliceai2 import process_variants_spliceai_2
+from .scripts.spliceai3 import process_variants_spliceai_3
+from .scripts.post_processing import post_processing
 
 def get_options():
     parser = argparse.ArgumentParser(
@@ -16,6 +23,8 @@ def get_options():
                         help='Path to the input VCF/TSV file')
     parser.add_argument('-O', metavar='output', nargs='?', help='Path to the output TSV file')
     parser.add_argument('--splice', action='store_true', help='Enable SpliceAI processing')
+    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory')
+    parser.add_argument('--full', action='store_true', help='Enable full annotation')
     args = parser.parse_args()
     return args
 
@@ -24,6 +33,8 @@ def main():
     splice = args.splice
     input_file = args.I
     output_file = args.O
+    data_dir = args.data_dir
+    full_anno = args.full
 
     # Assign default output file if not provided
     if not output_file:
@@ -59,17 +70,8 @@ def main():
             end_time = time.time()
             logging.info(f"Unzipping input file execution time:\t {int(end_time - start_time)} seconds")
 
-        # Check required scripts and files
-        required_scripts = [
-            "./scripts/Filter-input.py",
-            "./scripts/Score.py"
-        ]
-        for script in required_scripts:
-            if not os.path.isfile(script):
-                logging.error(f"Required script '{script}' not found.")
-                sys.exit(1)
-
-        required_data_file = "./data/5UTRs.intervals.bed"
+        # Paths to scripts and data
+        required_data_file = os.path.join(os.path.dirname(__file__), 'data', '5UTRs.intervals.bed')
         if not os.path.isfile(required_data_file):
             logging.error(f"Database file '{required_data_file}' not found.")
             sys.exit(1)
@@ -77,96 +79,80 @@ def main():
         # Filter VCF/TSV data for 5'UTRs
         start_time = time.time()
         filtered_output = os.path.join(tmp_dir, f"5UTR.{os.path.basename(output_file)}.tsv")
-        filter_command = [
-            sys.executable, "./scripts/Filter-input.py",
-            input_file,
-            required_data_file
-        ]
         logging.info("Filtering input file for 5'UTRs...")
-        with open(filtered_output, 'w') as f_out:
-            try:
-                subprocess.run(filter_command, check=True, stdout=f_out)
-            except subprocess.CalledProcessError as e:
-                logging.error(f"Filter-input.py failed with error: {e}")
-                sys.exit(1)
-            except FileNotFoundError:
-                logging.error(f"Script not found: {' '.join(filter_command)}")
-                sys.exit(1)
+        try:
+            filter_input(input_file, required_data_file, filtered_output)
+        except Exception as e:
+            logging.error(f"Filter-input failed with error: {e}")
+            sys.exit(1)
+
         end_time = time.time()
         logging.info(f"5'UTR filtering execution time:\t {int(end_time - start_time)} seconds")
 
         # Conditional SpliceAI Processing
         if splice:
-            spliceai_script = "./scripts/Spliceai-Main.py"
-            if not os.path.isfile(spliceai_script):
-                logging.error(f"Script '{spliceai_script}' not found.")
-                sys.exit(1)
-            spliceai_output = os.path.join(tmp_dir, f"Spliceai.{os.path.basename(output_file)}")
-            spliceai_command = [sys.executable,
-                spliceai_script,
-                filtered_output,
-                spliceai_output
-            ]
+            # spliceai Detection processing
+            splice_1_output = os.path.join(tmp_dir, f"splice1.5UTR.{os.path.basename(output_file)}")
+            splice_2_output = os.path.join(tmp_dir, f"splice2.5UTR.{os.path.basename(output_file)}")
+            splice_3_output = os.path.join(tmp_dir, f"splice3.5UTR.{os.path.basename(output_file)}")
             start_time = time.time()
-            logging.info("Running Spliceai-Main.py on detection output...")
+            logging.info("Running splice detection on filtered output...")
             try:
-                subprocess.run(spliceai_command, check=True)
-            except subprocess.CalledProcessError as e:
-                logging.error(f"Spliceai-Main.py failed with error: {e}")
-                sys.exit(1)
-            except FileNotFoundError:
-                logging.error(f"Script not found: {' '.join(spliceai_command)}")
+                if filtered_output.endswith('.vcf'):
+                    variants = load_vcf_data(filtered_output)
+                else:
+                    variants = load_tsv_data(filtered_output)
+                process_spliceai_1(variants, splice_1_output, data_dir=data_dir)
+                process_variants_spliceai_2(splice_1_output, splice_2_output, data_dir=data_dir)
+                process_variants_spliceai_3(splice_2_output, splice_3_output, data_dir=data_dir)
+            except Exception as e:
+                logging.error(f"splice Detection failed with error: {e}")
                 sys.exit(1)
             end_time = time.time()
-            logging.info(f"Spliceai-Main.py execution time:\t {int(end_time - start_time)} seconds")
-            scoring_input = spliceai_output
+            logging.info(f"5'UTR splice detection execution time:\t {int(end_time - start_time)} seconds")
+            scoring_input = splice_3_output
         else:
-            detection_script = "./scripts/Detection.py"
-            if not os.path.isfile(detection_script):
-                logging.error(f"Script '{detection_script}' not found.")
-                sys.exit(1)
+            # Detection processing
             detection_output = os.path.join(tmp_dir, f"Detection.5UTR.{os.path.basename(output_file)}")
-            detection_command = [
-                sys.executable, detection_script,
-                filtered_output,
-                detection_output
-            ]
             start_time = time.time()
-            logging.info("Running Detection.py on filtered output...")
+            logging.info("Running detection on filtered output...")
             try:
-                subprocess.run(detection_command, check=True)
-            except subprocess.CalledProcessError as e:
-                logging.error(f"Detection.py failed with error: {e}")
-                sys.exit(1)
-            except FileNotFoundError:
-                logging.error(f"Script not found: {' '.join(detection_command)}")
+                if filtered_output.endswith('.vcf'):
+                    variants = load_vcf_data(filtered_output)
+                else:
+                    variants = load_tsv_data(filtered_output)
+                process_variants(variants, detection_output, data_dir=data_dir)
+            except Exception as e:
+                logging.error(f"Detection failed with error: {e}")
                 sys.exit(1)
             end_time = time.time()
             logging.info(f"5'UTR detection execution time:\t {int(end_time - start_time)} seconds")
             scoring_input = detection_output
 
         # Run Scoring
-        score_script = "./scripts/Score.py"
-        if not os.path.isfile(score_script):
-            logging.error(f"Script '{score_script}' not found.")
-            sys.exit(1)
-        score_command = [
-            sys.executable, score_script,
-            scoring_input,
-            output_file
-        ]
         start_time = time.time()
-        logging.info("Running Score.py...")
+        logging.info("Running scoring...")
+        scoring_output = os.path.join(tmp_dir, f"Scoring.5UTR.{os.path.basename(output_file)}")
         try:
-            subprocess.run(score_command, check=True)
-        except subprocess.CalledProcessError as e:
-            logging.error(f"Score.py failed with error: {e}")
+            score_variants(scoring_input, scoring_output, data_dir=data_dir)
+        except Exception as e:
+            logging.error(f"Scoring failed with error: {e}")
             sys.exit(1)
-        except FileNotFoundError:
-            logging.error(f"Script not found: {' '.join(score_command)}")
-            sys.exit(1)
+
         end_time = time.time()
         logging.info(f"Scoring execution time:\t {int(end_time - start_time)} seconds")
+
+        # Run Post Processing
+        start_time = time.time()
+        logging.info("Post Processing...")
+        try:
+            post_processing(scoring_output, output_file, data_dir=data_dir)
+        except Exception as e:
+            logging.error(f"Post Processing with error: {e}")
+            sys.exit(1)
+
+        end_time = time.time()
+        logging.info(f"Post Processing execution time:\t {int(end_time - start_time)} seconds")
 
     # Calculate and print total execution time
     end_time_total = time.time()

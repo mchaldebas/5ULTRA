@@ -34,22 +34,18 @@
     - joblib
     - sklearn
 ### Steps
-1. Clone the Repository:
+1. Pip installation:
 ```
-git clone https://github.com/mchaldebas/5ULTRA.git
-cd 5ULTRA
+pip install 5ULTRA
 ```
-2. Install Python Dependencies:
+2. Download data (default path: ~/.5ULTRA/data):
 ```
-pip install pysam pandas numpy joblib sklearn
+5ULTRA-download-data [--data-dir path/to/data]
 ```
-3. Ensure Data Files Are in Place:
-    - Place 5UTRs.intervals.bed, 5UTRs.tsv, and uORFs.tsv in the ./data directory.
-    - Ensure PhyloP and PhastCons score files are available and indexed with tabix.
 
 ## Usage
 ```
-python 5ULTRA.py [--splice] [--full] <input_file> [output_file]
+5ULTRA [--splice] [--full] [--data-dir path/to/data] <input_file> [output_file]
 ```
 ### Options
 - <input_file>: Path to the input VCF or TSV file containing genetic variants.

@@ -47,11 +47,11 @@ pip install fiveULTRA
 5ULTRA [-h] -I [input] [-O [output]] [--data-dir path/to/data] [--splice] [--full]
 ```
 ### Options
-- -I: Path to the input VCF or TSV file containing genetic variants.
-- -O: (Optional) Path for the output TSV file. Defaults to <input_file>.5ULTRA.tsv if not specified.
-- --data-dir: (Optional) 
-- --splice: (Optional) Enable SpliceAI processing for splicing impact analysis.
-- --full: (Optional) Get the Full annotation in the output.
+- ```-I```: Path to the input VCF or TSV file containing genetic variants.
+- ```-O```: (Optional) Path for the output TSV file. Defaults to <input_file>.5ULTRA.tsv if not specified.
+- ```--data-dir path/to/data```: (Optional) 
+- ```--splice```: (Optional) Enable SpliceAI processing for splicing impact analysis.
+- ```--full```: (Optional) Get the Full annotation in the output.
 ### Examples
 #### Basic Usage
 ```

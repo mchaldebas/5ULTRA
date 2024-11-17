@@ -24,15 +24,8 @@
 ## Installation
 
 ### Prerequisites
-- Operating System: Linux or macOS
-- Software:
-    - Python 3.x
-- Python Packages:
-    - pysam
-    - pandas
-    - numpy
-    - joblib
-    - sklearn
+- Python 3.6
+- pip
 ### Steps
 1. Pip installation:
 ```

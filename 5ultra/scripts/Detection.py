@@ -146,18 +146,18 @@ def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR)
         pos1, pos2, pos3 = uORF_START, uORF_START - 1, uORF_START - 2
     # Get Phylop scores for the 3 nucleotides
     phyloP_scores = [
-        get_score(CHR, pos1, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos2, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos3, "./data/PhyloP/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR))
+        get_score(CHR, pos1, "./data/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos2, "./data/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos3, "./data/5UTR.hg38.phyloP100way/{}.bed.gz".format(CHR))
     ]
     # Calculate mean Phylop score
     phyloP_scores = [float(score) for score in phyloP_scores if score and (score.replace('.', '', 1).replace('-', '', 1).isdigit())]
     mean_phylop = sum(phyloP_scores) / len(phyloP_scores) if phyloP_scores else "NA"
     # Get PhastCons scores for the 3 nucleotides
     phastCons_scores = [
-        get_score(CHR, pos1, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos2, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
-        get_score(CHR, pos3, "./data/Phastcons/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR))
+        get_score(CHR, pos1, "./data/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos2, "./data/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR)),
+        get_score(CHR, pos3, "./data/5UTR.hg38.phastCons100way/{}.bed.gz".format(CHR))
     ]
     # Calculate mean PhastCons score
     phastCons_scores = [float(score) for score in phastCons_scores if score and score.replace('.', '', 1).isdigit()]

@@ -281,8 +281,8 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript):
 
 def process_variants(input_variants, output_file_path, data_dir='./data'):
     """Processes all variants and writes the results to the output file."""
-    UTR_FILE_PATH = os.path.join(data_dir, '5UTRs.tsv')
-    UORF_FILE_PATH = os.path.join(data_dir, 'uORFs.tsv')
+    UTR_FILE_PATH = os.path.join(os.path.expanduser(data_dir), '5UTRs.tsv')
+    UORF_FILE_PATH = os.path.join(os.path.expanduser(data_dir), 'uORFs.tsv')
     UTRs = load_tsv_data(UTR_FILE_PATH)
     uORFs = load_tsv_data(UORF_FILE_PATH)
     utrs_by_chromosome = defaultdict(list)
@@ -317,7 +317,7 @@ def main():
         variants = load_vcf_data(args.input_file_path)
     else:
         variants = load_tsv_data(args.input_file_path)
-    process_variants(variants, args.output_file_path, data_dir=args.data_dir)
+    process_variants(variants, args.output_file_path, args.data_dir)
 
 if __name__ == "__main__":
     main()

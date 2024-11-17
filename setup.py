@@ -7,7 +7,7 @@ current_directory = os.path.abspath(os.path.dirname(__file__))
 with io.open(os.path.join(current_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-setup(name='5ULTRA',
+setup(name='fiveULTRA',
         description='5ULTRA: A Pipeline for 5UTR Variant Annotation and Scoring',
         long_description=long_description,
         long_description_content_type='text/markdown',
@@ -23,8 +23,8 @@ setup(name='5ULTRA',
                             'scikit-learn>=1.0.2',
         ],
         entry_points={'console_scripts': [
-                        '5ULTRA=5ULTRA.__main__:main',
-                        '5ULTRA-download-data=5ULTRA.download_data:main',
+                        '5ULTRA=fiveULTRA.__main__:main',
+                        '5ULTRA-download-data=fiveULTRA.download_data:main',
                         ],
         },
         classifiers=['Programming Language :: Python :: 3',

@@ -36,7 +36,7 @@
 ### Steps
 1. Pip installation:
 ```
-pip install 5ULTRA
+pip install fiveULTRA
 ```
 2. Download data (default path: ~/.5ULTRA/data):
 ```

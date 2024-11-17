@@ -71,7 +71,7 @@ def main():
             logging.info(f"Unzipping input file execution time:\t {int(end_time - start_time)} seconds")
 
         # Paths to scripts and data
-        required_data_file = os.path.join(os.path.dirname(__file__), 'data', '5UTRs.intervals.bed')
+        required_data_file = os.path.join(data_dir, '5UTRs.intervals.bed')
         if not os.path.isfile(required_data_file):
             logging.error(f"Database file '{required_data_file}' not found.")
             sys.exit(1)
@@ -102,9 +102,9 @@ def main():
                     variants = load_vcf_data(filtered_output)
                 else:
                     variants = load_tsv_data(filtered_output)
-                process_spliceai_1(variants, splice_1_output, data_dir=data_dir)
-                process_variants_spliceai_2(splice_1_output, splice_2_output, data_dir=data_dir)
-                process_variants_spliceai_3(splice_2_output, splice_3_output, data_dir=data_dir)
+                process_spliceai_1(variants, splice_1_output, data_dir)
+                process_variants_spliceai_2(splice_1_output, splice_2_output, data_dir)
+                process_variants_spliceai_3(splice_2_output, splice_3_output, data_dir)
             except Exception as e:
                 logging.error(f"splice Detection failed with error: {e}")
                 sys.exit(1)
@@ -121,7 +121,7 @@ def main():
                     variants = load_vcf_data(filtered_output)
                 else:
                     variants = load_tsv_data(filtered_output)
-                process_variants(variants, detection_output, data_dir=data_dir)
+                process_variants(variants, detection_output, data_dir)
             except Exception as e:
                 logging.error(f"Detection failed with error: {e}")
                 sys.exit(1)
@@ -134,7 +134,7 @@ def main():
         logging.info("Running scoring...")
         scoring_output = os.path.join(tmp_dir, f"Scoring.5UTR.{os.path.basename(output_file)}")
         try:
-            score_variants(scoring_input, scoring_output, data_dir=data_dir)
+            score_variants(scoring_input, scoring_output, data_dir)
         except Exception as e:
             logging.error(f"Scoring failed with error: {e}")
             sys.exit(1)
@@ -146,7 +146,7 @@ def main():
         start_time = time.time()
         logging.info("Post Processing...")
         try:
-            post_processing(scoring_output, output_file, data_dir=data_dir)
+            post_processing(scoring_output, output_file, data_dir)
         except Exception as e:
             logging.error(f"Post Processing with error: {e}")
             sys.exit(1)

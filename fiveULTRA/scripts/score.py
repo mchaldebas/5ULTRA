@@ -28,8 +28,8 @@ def score_variants(input_file, output_file, data_dir='./data'):
     - scripts_dir: Path to the scripts directory where models are stored.
     """
     # Load the saved Random Forest model and encoders
-    rf_model_path = os.path.join(data_dir, 'random_forest_model.pkl')
-    encoder_path = os.path.join(data_dir, 'onehot_encoder.pkl')
+    rf_model_path = os.path.join(os.path.expanduser(data_dir), 'random_forest_model.pkl')
+    encoder_path = os.path.join(os.path.expanduser(data_dir), 'onehot_encoder.pkl')
 
     rf = joblib.load(rf_model_path)
     encoder = joblib.load(encoder_path)

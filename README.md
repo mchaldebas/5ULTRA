@@ -40,6 +40,7 @@ pip install fiveULTRA
 5ULTRA [-h] -I [input] [-O [output]] [--data-dir [path/to/data]] [--splice] [--full]
 ```
 ### Options
+- ```-h```: Show help message and exit
 - ```-I```: Path to the input VCF or TSV file containing genetic variants.
 - ```-O [output]```: Path for the output TSV file. Defaults to <input_file>.5ULTRA.tsv if not specified.
 - ```--data-dir [path/to/data]```: 

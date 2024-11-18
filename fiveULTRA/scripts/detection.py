@@ -106,7 +106,7 @@ def get_score(chrom, pos, file_path):
     except (OSError, ValueError, KeyError, pysam.TabixError):
         return None
 
-def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR):
+def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR, data_dir):
     """Annotates created uORFs (uStart gain)."""
     uORF_START = relativePosition - 2
     while mutatedSequence[uORF_START: uORF_START + 3] != 'ATG':
@@ -127,16 +127,16 @@ def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR)
     else:
         pos1, pos2, pos3 = uORF_START_GENOMIC, uORF_START_GENOMIC - 1, uORF_START_GENOMIC - 2
     phyloP_scores = [
-        get_score(CHR, pos1, f"./data/5UTR.hg38.phyloP100way/{CHR}.bed.gz"),
-        get_score(CHR, pos2, f"./data/5UTR.hg38.phyloP100way/{CHR}.bed.gz"),
-        get_score(CHR, pos3, f"./data/5UTR.hg38.phyloP100way/{CHR}.bed.gz")
+        get_score(CHR, pos1, os.path.join(os.path.expanduser(data_dir), '5UTR.hg38.phyloP100way', f"{CHR}.bed.gz")),
+        get_score(CHR, pos2, os.path.join(os.path.expanduser(data_dir), '5UTR.hg38.phyloP100way', f"{CHR}.bed.gz")),
+        get_score(CHR, pos3, os.path.join(os.path.expanduser(data_dir), '5UTR.hg38.phyloP100way', f"{CHR}.bed.gz"))
     ]
     phyloP_scores = [float(score) for score in phyloP_scores if score and is_valid_number(score)]
     mean_phylop = sum(phyloP_scores) / len(phyloP_scores) if phyloP_scores else "NA"
     phastCons_scores = [
-        get_score(CHR, pos1, f"./data/5UTR.hg38.phastCons100way/{CHR}.bed.gz"),
-        get_score(CHR, pos2, f"./data/5UTR.hg38.phastCons100way/{CHR}.bed.gz"),
-        get_score(CHR, pos3, f"./data/5UTR.hg38.phastCons100way/{CHR}.bed.gz")
+        get_score(CHR, pos1, os.path.join(os.path.expanduser(data_dir), '5UTR.hg38.phastCons100way', f"{CHR}.bed.gz")),
+        get_score(CHR, pos2, os.path.join(os.path.expanduser(data_dir), '5UTR.hg38.phastCons100way', f"{CHR}.bed.gz")),
+        get_score(CHR, pos3, os.path.join(os.path.expanduser(data_dir), '5UTR.hg38.phastCons100way', f"{CHR}.bed.gz"))
     ]
     phastCons_scores = [float(score) for score in phastCons_scores if score and is_valid_number(score)]
     mean_phastcons = sum(phastCons_scores) / len(phastCons_scores) if phastCons_scores else "NA"
@@ -147,7 +147,7 @@ def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR)
         uORF_LENGTH, uORF_LENGTH / 3, '', '', mean_phylop, mean_phastcons
     ]
 
-def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript):
+def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir):
     """Processes a single variant and returns the annotated result."""
     CHR = variant[0] if 'chr' in variant[0] else 'chr' + variant[0]
     POS = int(variant[1])
@@ -193,7 +193,7 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript):
                     uORFAnnotations.append([''] * 15)
         if 'ATG' in mutatedSequence[relativePosition-2: relativePosition+len(ALT)+2] and 'ATG' not in wtSEQ[relativePosition-2: relativePosition+len(REF)+2]:
             CSQ[0].append('uStart_gain')
-            Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR)
+            Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR, data_dir)
             uORFAnnotations.append(Anno)
             CSQ[1].append('N-terminal extension' if uORFAnnotations[-1][6] == 'N-terminal extension' else 'decreased')
         if float(UTR[14]) != 0:
@@ -279,7 +279,7 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript):
             count += 1
     return result
 
-def process_variants(input_variants, output_file_path, data_dir='./data'):
+def process_variants(input_variants, output_file_path, data_dir='~/.5ULTRA/data'):
     """Processes all variants and writes the results to the output file."""
     UTR_FILE_PATH = os.path.join(os.path.expanduser(data_dir), '5UTRs.tsv')
     UORF_FILE_PATH = os.path.join(os.path.expanduser(data_dir), 'uORFs.tsv')
@@ -302,7 +302,7 @@ def process_variants(input_variants, output_file_path, data_dir='./data'):
         for variant in input_variants[1:]:
             if ',' in variant[4]:
                 continue
-            processed_variant = process_variant(variant, utrs_by_chromosome, uorfs_by_transcript)
+            processed_variant = process_variant(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir)
             if processed_variant:
                 writer.writerows(processed_variant)
 

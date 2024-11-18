@@ -95,6 +95,3 @@ This project is licensed under the Creative Commons Attribution-NonCommercial-No
 > **Laboratory:** St. Giles Laboratory of Human Genetics of Infectious Diseases
 
 > **Institution:** The Rockefeller University, New York, NY, USA
-
-## Disclaimer
-This tool is intended for research purposes only and is not certified for clinical use.

@@ -52,7 +52,7 @@ python 5ULTRA.py test-variants.tsv
 ```
 #### Usage with all Arguments
 ```
-python 5ULTRA.py --splice --full test-variants.tsv fully_annotated_variants.tsv
+python 5ULTRA.py -I test-variants.tsv -O fully_annotated_variants.tsv --data-dir ~/.5ULTRA/data --splice --full 
 ```
 ## Input and Output File Format
 

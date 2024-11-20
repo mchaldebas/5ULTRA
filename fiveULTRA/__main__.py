@@ -134,7 +134,7 @@ def main():
         logging.info("Running scoring...")
         scoring_output = os.path.join(tmp_dir, f"Scoring.5UTR.{os.path.basename(output_file)}")
         try:
-            score_variants(scoring_input, scoring_output, data_dir)
+            score_variants(scoring_input, output_file, data_dir)
         except Exception as e:
             logging.error(f"Scoring failed with error: {e}")
             sys.exit(1)
@@ -142,22 +142,23 @@ def main():
         end_time = time.time()
         logging.info(f"Scoring execution time:\t {int(end_time - start_time)} seconds")
 
-        # Run Post Processing
-        start_time = time.time()
-        logging.info("Post Processing...")
-        try:
-            post_processing(scoring_output, output_file, data_dir)
-        except Exception as e:
-            logging.error(f"Post Processing with error: {e}")
-            sys.exit(1)
+#        # Run Post Processing
+ #       start_time = time.time()
+  #      logging.info("Post Processing...")
+   #     try:
+    #        post_processing(scoring_output, output_file, data_dir)
+     #   except Exception as e:
+      #      logging.error(f"Post Processing with error: {e}")
+       #     sys.exit(1)
 
-        end_time = time.time()
-        logging.info(f"Post Processing execution time:\t {int(end_time - start_time)} seconds")
+        #end_time = time.time()
+        #logging.info(f"Post Processing execution time:\t {int(end_time - start_time)} seconds")
 
     # Calculate and print total execution time
     end_time_total = time.time()
     total_time = int(end_time_total - start_time_total)
     logging.info(f"Total execution time:\t {total_time} seconds")
+    logging.info(f"Results available:\t {output_file}")
 
 if __name__ == '__main__':
     main()

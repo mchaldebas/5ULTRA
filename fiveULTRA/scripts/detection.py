@@ -169,8 +169,10 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir):
                 break
         if status == 'out':
             continue
-        relativePosition = calculate_distance_from_five_cap(exons, UTR[3], POS) if UTR[3] == '+' and len(REF) == 1 \
-            else calculate_distance_from_five_cap(exons, UTR[3], POS + len(REF) - 1)
+        if UTR[3] == '+':
+            relativePosition = calculate_distance_from_five_cap(exons, UTR[3], POS)
+        else:
+            relativePosition = calculate_distance_from_five_cap(exons, UTR[3], POS + len(REF) - 1)
         wtSEQ = UTR[12]
         mutatedSequence = wtSEQ[:relativePosition] + (ALT if UTR[3] == '+' else rev_seq(ALT)) + wtSEQ[relativePosition+len(REF):]
         startPOS = calculate_distance_from_five_cap(exons, UTR[3], int(UTR[2])) if UTR[3] == '+' \
@@ -192,6 +194,11 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir):
                     CSQ[1].append('increased')
                     uORFAnnotations.append([''] * 15)
         if 'ATG' in mutatedSequence[relativePosition-2: relativePosition+len(ALT)+2] and 'ATG' not in wtSEQ[relativePosition-2: relativePosition+len(REF)+2]:
+            CSQ[0].append('uStart_gain')
+            Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR, data_dir)
+            uORFAnnotations.append(Anno)
+            CSQ[1].append('N-terminal extension' if uORFAnnotations[-1][6] == 'N-terminal extension' else 'decreased')
+        elif relativePosition < 2 and 'ATG' in mutatedSequence[: relativePosition+len(ALT)+2] and 'ATG' not in wtSEQ[: relativePosition+len(REF)+2]:
             CSQ[0].append('uStart_gain')
             Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR, data_dir)
             uORFAnnotations.append(Anno)
@@ -221,7 +228,7 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir):
                         continue
                     # scan frame for STOP then uStop gain & uStop loss
                     codon = uSTART
-                    while mutatedSequence[codon : codon +3] not in STOP_CODONS and codon < len(mutatedSequence):
+                    while mutatedSequence[codon : codon +3] not in STOP_CODONS and codon < len(mutatedSequence) and codon != startPOS:
                         codon += 3
                     NewUstopCodon = mutatedSequence[codon : codon+3]
                     if codon < uSTOP and codon +2 < startPOS:
@@ -236,24 +243,29 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir):
                             CSQ[1].extend(['decreased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
                             uORFAnnotations += [Anno]
-                        else:
+                        elif uORF[20] == 'Non-Overlapping':
                             CSQ[0].extend(['uStop_gain shorter Non-Overlapping'])
                             CSQ[1].extend(['increased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
                             uORFAnnotations += [Anno]
                             continue
-                    if codon > uSTOP and uORF[20] == 'Non-Overlapping':
-                        if codon >= startPOS and (codon - startPOS) %3 == 0:
+                    elif codon < uSTOP and codon == startPOS and uORF[20] == 'Overlapping':
+                        CSQ[0].extend(['uStop_gain to N-terminal extension'])
+                        CSQ[1].extend(['N-terminal extension'])
+                        Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19]] + uORF[20:-4] + uORF[-3:]
+                        uORFAnnotations += [Anno]
+                    elif codon > uSTOP and uORF[20] != 'Overlapping':
+                        if codon == startPOS and uORF[20] != 'N-terminal extension':
                             CSQ[0].extend(['uStop_loss to N-terminal extension'])
                             CSQ[1].extend(['N-terminal extension'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
                             uORFAnnotations += [Anno]
-                        elif codon >= startPOS:
+                        elif codon > startPOS:
                             CSQ[0].extend(['uStop_loss to Overlapping'])
                             CSQ[1].extend(['decreased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]
                             uORFAnnotations += [Anno]
-                        else:
+                        elif uORF[20] == 'Non-Overlapping':
                             CSQ[0].extend(['uStop_loss longer Non-Overlapping'])
                             CSQ[1].extend(['decreased'])
                             Anno = uORF[1:3] + [uORF[4]] + uORF[17:19] + [uORF[19] + " > " + NewUstopCodon] + uORF[20:-4] + uORF[-3:]

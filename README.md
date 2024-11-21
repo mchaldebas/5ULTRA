@@ -86,7 +86,7 @@ Contributions are welcome! Please submit pull requests or open issues on the Git
 
 ## License
 
-This project is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0). See the LICENSE file for details.
+This project is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International ([CC BY-NC-ND 4.0](LISCENCE)). See the LICENSE file for details.
 
 ## Contact
 > **Developer:** Matthieu Chaldebas, Ph.D. candidate

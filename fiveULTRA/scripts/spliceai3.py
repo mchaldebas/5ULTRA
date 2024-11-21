@@ -298,8 +298,8 @@ def process_variant_spliceai_3(variant, utrs_by_transcript, uorfs_by_transcript,
 
 def process_variants_spliceai_3(input_variants, output_file_path, data_dir='~/.5ULTRA/data'):
     """Processes all variants and writes the results to the output file."""
-    UTR_FILE_PATH = os.path.join(data_dir, '5UTRs.tsv')
-    UORF_FILE_PATH = os.path.join(data_dir, 'uORFs.tsv')
+    UTR_FILE_PATH = os.path.join(os.path.expanduser(data_dir), '5UTRs.tsv')
+    UORF_FILE_PATH = os.path.join(os.path.expanduser(data_dir), 'uORFs.tsv')
     UTRs = load_tsv_data(UTR_FILE_PATH)
     uORFs = load_tsv_data(UORF_FILE_PATH)
     utrs_by_chromosome = defaultdict(list)
@@ -328,7 +328,7 @@ def main():
     parser = argparse.ArgumentParser(description='Detect variants.')
     parser.add_argument('input_file_path', type=str, help='Path to the filtered input file.')
     parser.add_argument('output_file_path', type=str, help='Path to the detection output file.')
-    parser.add_argument('--data-dir', type=str, default='./data', help='Path to the data directory.')
+    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory.')
     args = parser.parse_args()
     if args.input_file_path.endswith('.vcf'):
         variants = load_vcf_data(args.input_file_path)

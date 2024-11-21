@@ -126,9 +126,8 @@ def process_variant_spliceai_2(variant, UTRs_by_gene, Introns_by_transcript, cut
 
 def process_variants_spliceai_2(variants, output_file_path, data_dir, cutoff):
     """Processes all variants and writes the results to the output file."""
-    UTRS_FILE_PATH = os.path.join(data_dir, '5UTRs.tsv')
-    INTRONS_FILE_PATH = os.path.join(data_dir, 'Introns.tsv')
-
+    UTRS_FILE_PATH = os.path.join(os.path.expanduser(data_dir), '5UTRs.tsv')
+    INTRONS_FILE_PATH = os.path.join(os.path.expanduser(data_dir), 'Introns.tsv')
     UTRs = load_tsv_data(UTRS_FILE_PATH)
     Introns = load_tsv_data(INTRONS_FILE_PATH)
     UTRs_by_gene = defaultdict(list)
@@ -164,7 +163,7 @@ def main():
     parser = argparse.ArgumentParser(description='Process variants with SpliceAI annotations.')
     parser.add_argument('input_file', type=str, help='Path to the input variants file.')
     parser.add_argument('output_file', type=str, help='Path to the output file.')
-    parser.add_argument('--data-dir', type=str, default='./data', help='Path to the data directory.')
+    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory.')
     parser.add_argument('--cutoff', type=float, default=0.2, help='Cutoff value for scores.')
     args = parser.parse_args()
 

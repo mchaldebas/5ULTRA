@@ -53,7 +53,7 @@ def process_variant_spliceai_1(chrom, pos, ref, alt, snv_vcf, indel_vcf):
 
     return spliceai_results
 
-def process_spliceai_1(input_file, output_file, data_dir='./data', cutoff=0.2):
+def process_spliceai_1(input_file, output_file, data_dir='~/.5ULTRA/data', cutoff=0.2):
     """
     Processes an input file to add SpliceAI annotations.
 
@@ -68,8 +68,8 @@ def process_spliceai_1(input_file, output_file, data_dir='./data', cutoff=0.2):
         raise FileNotFoundError(f"Input file '{input_file}' not found.")
 
     # Paths to SpliceAI VCF files
-    snv_vcf_path = os.path.join(data_dir, "spliceai_scores.raw.snv.hg38.vcf.gz")
-    indel_vcf_path = os.path.join(data_dir, "spliceai_scores.raw.indel.hg38.vcf.gz")
+    snv_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai_scores.raw.snv.hg38.vcf.gz")
+    indel_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai_scores.raw.indel.hg38.vcf.gz")
 
     if not os.path.isfile(snv_vcf_path):
         raise FileNotFoundError(f"SNV VCF file '{snv_vcf_path}' not found.")
@@ -126,7 +126,7 @@ def main():
     parser = argparse.ArgumentParser(description='Process SpliceAI annotations.')
     parser.add_argument('input_file', type=str, help='Path to the input file.')
     parser.add_argument('output_file', type=str, help='Path to the output file.')
-    parser.add_argument('--data-dir', type=str, default='./data', help='Path to the data directory.')
+    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory.')
     parser.add_argument('--cutoff', type=float, default=0.2, help='Score cutoff for SpliceAI annotations.')
     args = parser.parse_args()
     try:

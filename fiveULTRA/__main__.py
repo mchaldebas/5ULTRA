@@ -35,7 +35,7 @@ def main():
     output_file = args.O
     data_dir = args.data_dir
     full_anno = args.full
-
+    cutoff = 0.2
     # Assign default output file if not provided
     if not output_file:
         base, _ = os.path.splitext(input_file)
@@ -98,12 +98,8 @@ def main():
             start_time = time.time()
             logging.info("Running splice detection on filtered output...")
             try:
-                if filtered_output.endswith('.vcf'):
-                    variants = load_vcf_data(filtered_output)
-                else:
-                    variants = load_tsv_data(filtered_output)
-                process_spliceai_1(variants, splice_1_output, data_dir)
-                process_variants_spliceai_2(splice_1_output, splice_2_output, data_dir)
+                process_spliceai_1(filtered_output, splice_1_output, data_dir, cutoff)
+                process_variants_spliceai_2(splice_1_output, splice_2_output, data_dir, cutoff)
                 process_variants_spliceai_3(splice_2_output, splice_3_output, data_dir)
             except Exception as e:
                 logging.error(f"splice Detection failed with error: {e}")

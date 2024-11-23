@@ -124,12 +124,13 @@ def process_variant_spliceai_2(variant, UTRs_by_gene, Introns_by_transcript, cut
             pass
     return result
 
-def process_variants_spliceai_2(variants, output_file_path, data_dir, cutoff):
+def process_variants_spliceai_2(input_file, output_file_path, data_dir, cutoff):
     """Processes all variants and writes the results to the output file."""
     UTRS_FILE_PATH = os.path.join(os.path.expanduser(data_dir), '5UTRs.tsv')
     INTRONS_FILE_PATH = os.path.join(os.path.expanduser(data_dir), 'Introns.tsv')
     UTRs = load_tsv_data(UTRS_FILE_PATH)
     Introns = load_tsv_data(INTRONS_FILE_PATH)
+    variants = load_tsv_data(input_file)
     UTRs_by_gene = defaultdict(list)
     Introns_by_transcript = defaultdict(list)
 
@@ -168,8 +169,7 @@ def main():
     args = parser.parse_args()
 
     # Load variants
-    variants = load_tsv_data(args.input_file)
-    process_variants_spliceai_2(variants, args.output_file, data_dir=args.data_dir, cutoff=args.cutoff)
+    process_variants_spliceai_2(args.input_file, args.output_file, data_dir=args.data_dir, cutoff=args.cutoff)
 
 if __name__ == "__main__":
     main()

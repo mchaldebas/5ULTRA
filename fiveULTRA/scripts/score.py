@@ -17,7 +17,7 @@ def filter_and_transform(df):
     }).fillna(df['uORF_TYPE'])
     return df
 
-def score_variants(input_file, output_file, data_dir='./data'):
+def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data'):
     """
     Scores the variants in the input file and writes the results to the output file.
 
@@ -36,21 +36,37 @@ def score_variants(input_file, output_file, data_dir='./data'):
 
     # Read the input data
     input_df = pd.read_csv(input_file, sep='\t', low_memory=False)
-
     # Backup the original dataframe before modifications
     original_df = input_df.copy()
 
-    # Add an identifier column for merging later
-    original_df['__original_index'] = original_df.index
-    input_df['__original_index'] = input_df.index
+    input_df['5UTR_LENGTH'] = pd.to_numeric(input_df['5UTR_LENGTH'], errors='coerce')
+    input_df['uSTART_mSTART_DIST'] = pd.to_numeric(input_df['uSTART_mSTART_DIST'], errors='coerce')
+    input_df['uSTART_CAP_DIST'] = input_df['5UTR_LENGTH'] - input_df['uSTART_mSTART_DIST']
+
+    columns_to_keep = ['translation', '5UTR_LENGTH', 'mKOZAK_STRENGTH', 'uORF_count',
+        'ribo_sorfs_uORFdb', 'uSTART_mSTART_DIST', 'uSTOP_CODON', 'uORF_TYPE',
+        'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_rank', 'uSTART_PHYLOP',
+        'uSTART_PHASTCONS', 'uSTART_CAP_DIST', 'CSQ', 'GENE']
+
+    input_df = input_df[columns_to_keep]
+
+    # Check if input_df is empty after reading
+    if input_df.empty:
+        print("The input file is empty. Creating an empty output file with appropriate headers.")
+        # Initialize '5ULTRA_Score' with NaN or any default value
+        original_df['5ULTRA_Score'] = pd.NA
+        # Save the empty (or original) DataFrame to the output file
+        original_df.to_csv(output_file, sep='\t', index=False)
+        return
 
     # Continue with transformations
     input_df = filter_and_transform(input_df)
 
     # Adding LOEUF and pLI gene annotation
-    pLI_file = os.path.join(data_dir, "pli&LOEUFByGene.tsv")
+    pLI_file = os.path.join(os.path.expanduser(data_dir), "pli&LOEUFByGene.tsv")
     pLI_data = pd.read_csv(pLI_file, sep="\t").drop_duplicates(subset="GENE")
-    input_df = input_df.merge(pLI_data, on="GENE", how="left")
+    pLI_data = pLI_data.drop_duplicates(subset="GENE")
+    input_df = input_df.merge(pLI_data, on="GENE", how="left", sort=False).set_index(input_df.index)
     input_df['pLI'] = pd.to_numeric(input_df['pLI'], errors='coerce')
 
     # Imputing Missing Values
@@ -59,25 +75,22 @@ def score_variants(input_file, output_file, data_dir='./data'):
     input_df[impute_columns] = median_imputer.fit_transform(input_df[impute_columns])
 
     # Drop unnecessary columns
-    columns_to_drop = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO',
-                       '5UTR_START', '5UTR_END', 'STRAND', 'GENE', 'TRANSCRIPT', 'mSTART',
-                       'mSTART_CODON', 'START_EXON', 'mKOZAK', 'MANE', 'uORF_START',
-                       'uORF_END', 'uSTART_CODON', 'uKOZAK', 'uORF_AA_LENGTH', 'uORF_SEQ',
-                       'Phastcons', 'PhyloP', 'uORF_mSTART_DIST', "Nterminal_count",
-                       "NonOverlapping_count", "Overlapping_count"]
+    columns_to_drop = ['GENE']
     input_df = input_df.drop(columns=columns_to_drop, errors='ignore')
 
     # One-Hot Encode 'CSQ'
     categorical_columns = ['CSQ']
     if 'CSQ' in input_df.columns:
         encoded_features_input = encoder.transform(input_df[categorical_columns])
-        encoded_df_input = pd.DataFrame(encoded_features_input, columns=encoder.get_feature_names_out(categorical_columns))
-        input_df = input_df.drop(columns=categorical_columns).reset_index(drop=True)
-        input_df = pd.concat([input_df, encoded_df_input], axis=1)
-    else:
-        csq_columns = encoder.get_feature_names_out(['CSQ'])
-        encoded_df_input = pd.DataFrame(0, index=input_df.index, columns=csq_columns)
-        input_df = input_df.reset_index(drop=True)
+        # Create a DataFrame from the encoded features, ensuring the index matches the input_df
+        encoded_df_input = pd.DataFrame(
+            encoded_features_input,
+            columns=encoder.get_feature_names_out(categorical_columns),
+            index=input_df.index  # Ensure the index matches the original DataFrame
+        )
+        # Drop the original categorical columns
+        input_df = input_df.drop(columns=categorical_columns)
+        # Concatenate the original DataFrame with the encoded features
         input_df = pd.concat([input_df, encoded_df_input], axis=1)
 
     # Label Encode other categorical features using the same mappings as in training
@@ -103,25 +116,15 @@ def score_variants(input_file, output_file, data_dir='./data'):
 
     # Prepare data for prediction
     feature_names = rf.feature_names_in_
-    # Include '__original_index' in columns to retain
-    input_df = input_df.reindex(columns=list(feature_names) + ['__original_index'], fill_value=0)
-
     # Prepare data for prediction
     X_input = input_df[feature_names]  # Use only feature columns
-
     # Predict probabilities
     y_pred_proba = rf.predict_proba(X_input)[:, 1]
-
     # Add the predicted probabilities to the processed dataframe
     input_df['5ULTRA_Score'] = y_pred_proba
-
+    ultra_score = input_df[['5ULTRA_Score']]
     # Merge scores back into the original dataframe
-    original_df = original_df.merge(
-        input_df[['__original_index', '5ULTRA_Score']],
-        on='__original_index',
-        how='left'
-    ).drop(columns='__original_index')
-
+    original_df = original_df.merge(ultra_score, left_index=True, right_index=True, how="left")
     # Save the results
     original_df.to_csv(output_file, sep='\t', index=False)
 
@@ -130,7 +133,7 @@ def main():
     parser = argparse.ArgumentParser(description='Score variants using the Random Forest model.')
     parser.add_argument('input_file', type=str, help='Path to the input TSV file.')
     parser.add_argument('output_file', type=str, help='Path to the output TSV file.')
-    parser.add_argument('--data-dir', type=str, default='./data', help='Path to the data directory.')
+    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory.')
     args = parser.parse_args()
     score_variants(args.input_file, args.output_file, data_dir=args.data_dir)
 

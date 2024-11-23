@@ -150,7 +150,7 @@ def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR,
 def process_variant_spliceai_3(variant, utrs_by_transcript, uorfs_by_transcript, data_dir):
     if not variant[1].isdigit():
         print(f"Warning: Skipping variant with invalid position value: {variant}")
-        return None  # or handle it as needed
+        return None
     CHR = variant[0] if 'chr' in variant[0] else 'chr' + variant[0]
     POS = int(variant[1])
     REF = variant[3]
@@ -292,21 +292,22 @@ def process_variant_spliceai_3(variant, utrs_by_transcript, uorfs_by_transcript,
                             uORFAnnotations += [Anno]
         count = 0
         for hit in CSQ[0]:
-            result.append( variant[-2].split('_') + variant[5:-4] + [variant[-4], variant[-1]] + [hit, CSQ[1][count]] + UTR[1:12] + UTR[14:] + uORFAnnotations[count])
+            result.append(variant[-2].split('_') + variant[5:-4] + [variant[-4], variant[-1]] + [hit, CSQ[1][count]] + UTR[1:12] + UTR[14:] + uORFAnnotations[count])
             count += 1
     return result
 
-def process_variants_spliceai_3(input_variants, output_file_path, data_dir='~/.5ULTRA/data'):
+def process_variants_spliceai_3(input_file_path, output_file_path, data_dir='~/.5ULTRA/data'):
     """Processes all variants and writes the results to the output file."""
     UTR_FILE_PATH = os.path.join(os.path.expanduser(data_dir), '5UTRs.tsv')
     UORF_FILE_PATH = os.path.join(os.path.expanduser(data_dir), 'uORFs.tsv')
     UTRs = load_tsv_data(UTR_FILE_PATH)
     uORFs = load_tsv_data(UORF_FILE_PATH)
-    utrs_by_chromosome = defaultdict(list)
+    variants = load_tsv_data(input_file_path)
+    utrs_by_transcript = defaultdict(list)
     uorfs_by_transcript = defaultdict(list)
     for UTR in UTRs[1:]:
-        CHR = UTR[0]
-        utrs_by_chromosome[CHR].append(UTR)
+        TRANSCRIPT = UTR[6]
+        utrs_by_transcript[TRANSCRIPT].append(UTR)
     UTR_headers = UTRs[0]
     for uORF in uORFs[1:]:
         TRANSCRIPTS = uORF[5]
@@ -314,12 +315,12 @@ def process_variants_spliceai_3(input_variants, output_file_path, data_dir='~/.5
     uORF_headers = uORFs[0]
     with open(output_file_path, 'w', newline='') as f:
         writer = csv.writer(f, delimiter='\t')
-        fields = input_variants[0] + ['CSQ', 'translation'] + UTR_headers[1:12] + UTR_headers[14:] + uORF_headers[1:3] + [uORF_headers[4]] + uORF_headers[17:-4] + uORF_headers[-3:]
+        fields = variants[0][:-4] + [variants[0][-4], variants[0][-1]] + ['CSQ', 'translation'] + UTR_headers[1:12] + UTR_headers[14:] + uORF_headers[1:3] + [uORF_headers[4]] + uORF_headers[17:-4] + uORF_headers[-3:]
         writer.writerow(fields)
-        for variant in input_variants[1:]:
+        for variant in variants[1:]:
             if ',' in variant[4]:
                 continue
-            processed_variant = process_variant_spliceai_3(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir)
+            processed_variant = process_variant_spliceai_3(variant, utrs_by_transcript, uorfs_by_transcript, data_dir)
             if processed_variant:
                 writer.writerows(processed_variant)
 
@@ -330,11 +331,8 @@ def main():
     parser.add_argument('output_file_path', type=str, help='Path to the detection output file.')
     parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory.')
     args = parser.parse_args()
-    if args.input_file_path.endswith('.vcf'):
-        variants = load_vcf_data(args.input_file_path)
-    else:
-        variants = load_tsv_data(args.input_file_path)
-    process_variants_spliceai_3(variants, args.output_file_path, data_dir=args.data_dir)
+
+    process_variants_spliceai_3(args.input_file_path, args.output_file_path, data_dir=args.data_dir)
 
 if __name__ == "__main__":
     main()

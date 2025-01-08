@@ -161,8 +161,8 @@ def process_variant_spliceai_3(variant, utrs_by_transcript, uorfs_by_transcript,
     for UTR in transcript_utrs:
         CSQ = [[],[]]
         uORFAnnotations = []
-        # check if variant is on the same chromosome and in the 5UTR bondaries
-        if not (int(UTR[1]) < POS < int(UTR[2])):
+        # check if variant is in the 5UTR bondaries
+        if not (int(UTR[1]) <= POS <= int(UTR[2])):
             continue
         exons = ast.literal_eval(UTR[13])
         # retreive relative position, wild type and mutated sequences

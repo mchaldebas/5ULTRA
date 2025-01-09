@@ -218,7 +218,7 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir):
                         uSTART -= len(REF) -1
                     uSTOP -= len(REF) -1
                 # check if variant is in uORF + uKozak
-                if uSTART-6 <= relativePosition <= uSTOP+2:
+                if (uSTART-6 <= relativePosition <= uSTOP+2) or (relativePosition <= uSTART <= relativePosition + len(REF)):
                     # uStart loss & uKozak
                     if mutatedSequence[uSTART : uSTART +3] != uORF[18] and mutatedSequence[uSTART : uSTART +3] != 'ATG':
                         CSQ[0].extend(['uStart_loss'])

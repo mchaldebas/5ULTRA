@@ -92,6 +92,7 @@ def main():
         # Conditional SpliceAI Processing
         if splice:
             # spliceai Detection processing
+            output_file = f"{base}.5ULTRA_splice.tsv"
             splice_1_output = os.path.join(tmp_dir, f"splice1.5UTR.{os.path.basename(output_file)}")
             splice_2_output = os.path.join(tmp_dir, f"splice2.5UTR.{os.path.basename(output_file)}")
             splice_3_output = os.path.join(tmp_dir, f"splice3.5UTR.{os.path.basename(output_file)}")

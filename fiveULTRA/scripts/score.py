@@ -63,7 +63,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data'):
     input_df = filter_and_transform(input_df)
 
     # Adding LOEUF and pLI gene annotation
-    pLI_file = os.path.join(os.path.expanduser(data_dir), "pli&LOEUFByGene.tsv")
+    pLI_file = os.path.join(os.path.expanduser(data_dir), "pli_LOEUFByGene.tsv")
     pLI_data = pd.read_csv(pLI_file, sep="\t").drop_duplicates(subset="GENE")
     pLI_data = pLI_data.drop_duplicates(subset="GENE")
     input_df = input_df.merge(pLI_data, on="GENE", how="left", sort=False).set_index(input_df.index)

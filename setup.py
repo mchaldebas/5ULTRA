@@ -20,7 +20,7 @@ setup(name='fiveULTRA',
                             'pandas>=1.4.4',
                             'numpy>=2.2.1',
                             'joblib>=1.1.0',
-                            'scikit-learn>=1.6.2',
+                            'scikit-learn>=1.6.1',
         ],
         entry_points={'console_scripts': [
                         '5ULTRA=fiveULTRA.__main__:main',

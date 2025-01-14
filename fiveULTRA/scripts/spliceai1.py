@@ -68,8 +68,8 @@ def process_spliceai_1(input_file, output_file, data_dir='~/.5ULTRA/data', cutof
         raise FileNotFoundError(f"Input file '{input_file}' not found.")
 
     # Paths to SpliceAI VCF files
-    snv_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai_scores.raw.snv.hg38.vcf.gz")
-    indel_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai_scores.raw.indel.hg38.vcf.gz")
+    snv_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai50.5UTRs.raw.snvs.hg38.vcf.gz")
+    indel_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai50.5UTRs.raw.indels.hg38.vcf.gz")
 
     if not os.path.isfile(snv_vcf_path):
         raise FileNotFoundError(f"SNV VCF file '{snv_vcf_path}' not found.")

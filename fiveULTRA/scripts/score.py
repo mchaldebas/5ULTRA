@@ -17,7 +17,7 @@ def filter_and_transform(df):
     }).fillna(df['uORF_TYPE'])
     return df
 
-def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data'):
+def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno=False):
     """
     Scores the variants in the input file and writes the results to the output file.
 
@@ -123,8 +123,30 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data'):
     # Add the predicted probabilities to the processed dataframe
     input_df['5ULTRA_Score'] = y_pred_proba
     ultra_score = input_df[['5ULTRA_Score']]
+    pLI = input_df[['pLI']]
+    LOEUF = input_df[['LOEUF']]
+    CAP = input_df[['uSTART_CAP_DIST']]
+
     # Merge scores back into the original dataframe
     original_df = original_df.merge(ultra_score, left_index=True, right_index=True, how="left")
+    original_df = original_df.merge(pLI, left_index=True, right_index=True, how="left")
+    original_df = original_df.merge(LOEUF, left_index=True, right_index=True, how="left")
+    original_df = original_df.merge(CAP, left_index=True, right_index=True, how="left")
+
+    if full_anno:
+        columns_order_to_keep = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
+        'translation', '5ULTRA_Score', '5UTR_START', '5UTR_END', 'STRAND', '5UTR_LENGTH', 
+        'GENE', 'TRANSCRIPT', 'MANE', 'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 
+        'uORF_count', 'Overlapping_count', 'Nterminal_count', 'NonOverlapping_count',
+        'uORF_START', 'uORF_END', 'ribo_sorfs_uORFdb', 'uSTART_mSTART_DIST',
+        'uSTART_CAP_DIST', 'uSTOP_CODON', 'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH',
+        'uORF_LENGTH', 'uORF_AA_LENGTH', 'uORF_rank', 'uSTART_PHYLOP',
+        'uSTART_PHASTCONS', 'pLI', 'LOEUF']
+    else:
+        columns_order_to_keep = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 'translation', '5ULTRA_Score']
+
+    original_df = original_df[columns_order_to_keep]
+
     # Save the results
     original_df.to_csv(output_file, sep='\t', index=False)
 

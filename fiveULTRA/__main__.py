@@ -13,7 +13,6 @@ from .scripts.score import score_variants
 from .scripts.spliceai1 import process_spliceai_1
 from .scripts.spliceai2 import process_variants_spliceai_2
 from .scripts.spliceai3 import process_variants_spliceai_3
-from .scripts.post_processing import post_processing
 
 def get_options():
     parser = argparse.ArgumentParser(
@@ -129,27 +128,14 @@ def main():
         # Run Scoring
         start_time = time.time()
         logging.info("Running scoring...")
-        scoring_output = os.path.join(tmp_dir, f"Scoring.5UTR.{os.path.basename(output_file)}")
         try:
-            score_variants(scoring_input, output_file, data_dir)
+            score_variants(scoring_input, output_file, data_dir, full_anno)
         except Exception as e:
             logging.error(f"Scoring failed with error: {e}")
             sys.exit(1)
 
         end_time = time.time()
         logging.info(f"Scoring execution time:\t {int(end_time - start_time)} seconds")
-
-#        # Run Post Processing
- #       start_time = time.time()
-  #      logging.info("Post Processing...")
-   #     try:
-    #        post_processing(scoring_output, output_file, data_dir)
-     #   except Exception as e:
-      #      logging.error(f"Post Processing with error: {e}")
-       #     sys.exit(1)
-
-        #end_time = time.time()
-        #logging.info(f"Post Processing execution time:\t {int(end_time - start_time)} seconds")
 
     # Calculate and print total execution time
     end_time_total = time.time()

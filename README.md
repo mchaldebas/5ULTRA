@@ -59,22 +59,45 @@ python 5ULTRA.py -I test-variants.tsv -O fully_annotated_variants.tsv --data-dir
 
 - ***Input***: VCF or TSV file with genetic variants.
 - ***Output***: TSV file containing annotated and scored variants.
-    - CHROM, POS, ID, REF, ALT (exactly the same as input)
-    - CSQ: 
+    - CHROM, POS, ID, REF, ALT (same as input)
+    - CSQ: Type of variant
+    - Translation: Increased, Decreased, or N-terminal Extension
+    - 5ULTRA_Score: Prioritization metric
+    - [SpliceAI]: SpliceAI scores for splicing variants that may affect 5’UTR sequence
+    - [Splicing_CSQ]: Type of splicing variant
     - GENE: Gene Symbol
-    - CDS translation: Increased, Decreased, or N-terminal Extension
-    - 5ULTRA_Score: 
-    - [Splice]: Tag for splicing variants that may affect 5’UTR (spliceAI-embeded)
+    - TRANSCRIPT: Ensembl transcript ID 
+
 - ***Full Annotation***: Additional columns in the output when --full specified
-    - test
-    - test
-    - test
-    - test
-    - test
-    - test
-    - test
-    - test
-    - test
+    - MANE: NCBI transcript ID if applicable (e.g., NM_123456789.1)
+    - 5UTR_START: Genomic position of the 5’UTR start.
+    - 5UTR_END: Genomic position of the 5’UTR end.
+    - STRAND: DNA strand (+ or -).
+    - 5UTR_LENGTH: Length of the 5’UTR.
+    - START_EXON: CDS start exon position.
+    - mKOZAK: Nucleotide sequence -4 to +5 around the CDS start.
+    - mKOZAK_STRENGTH: CDS Kozak context strength (Weak, Adequate, Strong, or NA).
+    - uORF_count: Total number of uORFs in the transcript.
+    - Overlapping_count: Number of overlapping uORFs.
+    - Nterminal_count: Number of N-terminal extension uORFs.
+    - NonOverlapping_count: Number of non-overlapping uORFs.
+    - uORF_START: Genomic position of the uORF start.
+    - uORF_END: Genomic position of the uORF end.
+    - Ribo_seq: Evidence of translation (True, False or New uORF)
+    - uSTART_mSTART_DIST: uORF start distance from the CDS start.
+    - uSTART_CAP_DIST: uORF start distance from the 5’UTR cap.
+    - uSTOP_CODON: Type of stop codon (TAA, TGA, or TAG).
+    - uORF_TYPE: uORF type (Non-overlapping, Overlapping, N-terminal extension).
+    - uKOZAK: Nucleotide sequence -4 to +5 around the uORF start.
+    - uKOZAK_STRENGTH: uORF Kozak context strength (Weak, Adequate, Strong, or NA).
+    - uORF_LENGTH: Length of the uORF.
+    - uORF_AA_LENGTH: Amino Acid length of the uORF.
+    - uORF_rank: Rank of the uORF based on proximity to the CDS start.
+    - uSTART_PHYLOP: Mean conservation score of the uORF start (PhyloP).
+    - uSTART_PHASTCONS: Mean conservation score of the uORF start (PhastCons).
+    - pLI: Gene probability of being loss-of-function intolerant.
+    - LOEUF: Gene loss-of-function observed/expected upper bound fraction.
+
 
 ## Reference
 

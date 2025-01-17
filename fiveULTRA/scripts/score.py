@@ -49,7 +49,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         'uSTART_PHASTCONS', 'uSTART_CAP_DIST', 'CSQ', 'GENE']
 
     input_df = input_df[columns_to_keep]
-
+    input_df = filter_and_transform(input_df)
     # Check if input_df is empty after reading
     if input_df.empty:
         print("The input file is empty. Creating an empty output file with appropriate headers.")
@@ -58,13 +58,15 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         original_df['pLI'] = pd.NA
         original_df['LOEUF'] = pd.NA
         original_df['uSTART_CAP_DIST'] = pd.NA
-        original_df.rename(columns={'ribo_sorfs_uORFdb': 'Ribo_seq'}, inplace=True)
+        rename_mapping = {
+        'ribo_sorfs_uORFdb': 'Ribo_seq',
+        'translation': 'Translation',
+        'type': 'Splicing_CSQ'
+        }
+        original_df.rename(columns={k: v for k, v in rename_mapping.items() if k in original_df.columns}, inplace=True)
         # Save the empty (or original) DataFrame to the output file
         original_df.to_csv(output_file, sep='\t', index=False)
         return
-
-    # Continue with transformations
-    input_df = filter_and_transform(input_df)
 
     # Adding LOEUF and pLI gene annotation
     pLI_file = os.path.join(os.path.expanduser(data_dir), "pli_LOEUFByGene.tsv")
@@ -74,6 +76,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     input_df['pLI'] = pd.to_numeric(input_df['pLI'], errors='coerce')
 
     # Imputing Missing Values
+
     impute_columns = ['pLI', 'LOEUF', 'uSTART_PHYLOP', 'uSTART_PHASTCONS']
     median_imputer = SimpleImputer(strategy='median')
     input_df[impute_columns] = median_imputer.fit_transform(input_df[impute_columns])
@@ -142,6 +145,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         'translation': 'Translation',
         'type': 'Splicing_CSQ'
     }
+
     original_df.rename(columns={k: v for k, v in rename_mapping.items() if k in original_df.columns}, inplace=True)
     original_df['Ribo_seq'] = original_df['Ribo_seq'].map({
         1: False, 101: True, 100: True, 111: True, 11: True, 
@@ -152,8 +156,8 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     if full_anno:
         columns_order_to_keep = [
             '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
-            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', '5UTR_START', 
-            '5UTR_END', 'STRAND', '5UTR_LENGTH', 'GENE', 'TRANSCRIPT', 'MANE', 
+            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', 'GENE', 
+            'TRANSCRIPT', 'MANE', '5UTR_START', '5UTR_END', 'STRAND', '5UTR_LENGTH', 
             'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 'uORF_count', 'Overlapping_count', 
             'Nterminal_count', 'NonOverlapping_count', 'uORF_START', 'uORF_END', 
             'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTART_CAP_DIST', 'uSTOP_CODON', 
@@ -163,7 +167,8 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     else:
         columns_order_to_keep = [
             '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 
-            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ'
+            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ',
+            'GENE', 'TRANSCRIPT'
         ]
 
     # Keep only existing columns

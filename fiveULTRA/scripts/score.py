@@ -55,6 +55,10 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         print("The input file is empty. Creating an empty output file with appropriate headers.")
         # Initialize '5ULTRA_Score' with NaN or any default value
         original_df['5ULTRA_Score'] = pd.NA
+        original_df['pLI'] = pd.NA
+        original_df['LOEUF'] = pd.NA
+        original_df['uSTART_CAP_DIST'] = pd.NA
+        original_df.rename(columns={'ribo_sorfs_uORFdb': 'Ribo_seq'}, inplace=True)
         # Save the empty (or original) DataFrame to the output file
         original_df.to_csv(output_file, sep='\t', index=False)
         return
@@ -132,20 +136,39 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     original_df = original_df.merge(pLI, left_index=True, right_index=True, how="left")
     original_df = original_df.merge(LOEUF, left_index=True, right_index=True, how="left")
     original_df = original_df.merge(CAP, left_index=True, right_index=True, how="left")
+    # Rename columns only if they exist
+    rename_mapping = {
+        'ribo_sorfs_uORFdb': 'Ribo_seq',
+        'translation': 'Translation',
+        'type': 'Splicing_CSQ'
+    }
+    original_df.rename(columns={k: v for k, v in rename_mapping.items() if k in original_df.columns}, inplace=True)
+    original_df['Ribo_seq'] = original_df['Ribo_seq'].map({
+        1: False, 101: True, 100: True, 111: True, 11: True, 
+        10: True, 110: True, 0: 'New uORF'
+    })
 
+    # Select columns to keep, ensuring they exist in the DataFrame
     if full_anno:
-        columns_order_to_keep = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
-        'translation', '5ULTRA_Score', '5UTR_START', '5UTR_END', 'STRAND', '5UTR_LENGTH', 
-        'GENE', 'TRANSCRIPT', 'MANE', 'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 
-        'uORF_count', 'Overlapping_count', 'Nterminal_count', 'NonOverlapping_count',
-        'uORF_START', 'uORF_END', 'ribo_sorfs_uORFdb', 'uSTART_mSTART_DIST',
-        'uSTART_CAP_DIST', 'uSTOP_CODON', 'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH',
-        'uORF_LENGTH', 'uORF_AA_LENGTH', 'uORF_rank', 'uSTART_PHYLOP',
-        'uSTART_PHASTCONS', 'pLI', 'LOEUF']
+        columns_order_to_keep = [
+            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
+            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', '5UTR_START', 
+            '5UTR_END', 'STRAND', '5UTR_LENGTH', 'GENE', 'TRANSCRIPT', 'MANE', 
+            'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 'uORF_count', 'Overlapping_count', 
+            'Nterminal_count', 'NonOverlapping_count', 'uORF_START', 'uORF_END', 
+            'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTART_CAP_DIST', 'uSTOP_CODON', 
+            'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_AA_LENGTH', 
+            'uORF_rank', 'uSTART_PHYLOP', 'uSTART_PHASTCONS', 'pLI', 'LOEUF'
+        ]
     else:
-        columns_order_to_keep = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 'translation', '5ULTRA_Score']
+        columns_order_to_keep = [
+            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 
+            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ'
+        ]
 
-    original_df = original_df[columns_order_to_keep]
+    # Keep only existing columns
+    columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
+    original_df = original_df[columns_to_keep]
 
     # Save the results
     original_df.to_csv(output_file, sep='\t', index=False)

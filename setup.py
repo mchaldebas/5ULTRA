@@ -31,6 +31,6 @@ setup(name='fiveULTRA',
                     'License :: Other/Proprietary License',
                     'Operating System :: OS Independent',
                     ],
-        python_requires='>=3.6',
+        python_requires='>=3.10',
         test_suite='tests',
         )

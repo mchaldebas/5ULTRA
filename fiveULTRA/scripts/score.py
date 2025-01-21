@@ -30,44 +30,21 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     # Load the saved Random Forest model and encoders
     rf_model_path = os.path.join(os.path.expanduser(data_dir), 'random_forest_model.pkl')
     encoder_path = os.path.join(os.path.expanduser(data_dir), 'onehot_encoder.pkl')
-
     rf = joblib.load(rf_model_path)
     encoder = joblib.load(encoder_path)
 
     # Read the input data
     input_df = pd.read_csv(input_file, sep='\t', low_memory=False)
-    # Backup the original dataframe before modifications
-    original_df = input_df.copy()
 
+    # Check if input_df is empty after reading
+    if input_df.empty:
+        print("No variants were found to affect translation in the input file. Exiting.")
+        return False
+    
     input_df['5UTR_LENGTH'] = pd.to_numeric(input_df['5UTR_LENGTH'], errors='coerce')
     input_df['uSTART_mSTART_DIST'] = pd.to_numeric(input_df['uSTART_mSTART_DIST'], errors='coerce')
     input_df['uSTART_CAP_DIST'] = input_df['5UTR_LENGTH'] - input_df['uSTART_mSTART_DIST']
-
-    columns_to_keep = ['translation', '5UTR_LENGTH', 'mKOZAK_STRENGTH', 'uORF_count',
-        'ribo_sorfs_uORFdb', 'uSTART_mSTART_DIST', 'uSTOP_CODON', 'uORF_TYPE',
-        'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_rank', 'uSTART_PHYLOP',
-        'uSTART_PHASTCONS', 'uSTART_CAP_DIST', 'CSQ', 'GENE']
-
-    input_df = input_df[columns_to_keep]
-    input_df = filter_and_transform(input_df)
-    # Check if input_df is empty after reading
-    if input_df.empty:
-        print("The input file is empty. Creating an empty output file with appropriate headers.")
-        # Initialize '5ULTRA_Score' with NaN or any default value
-        original_df['5ULTRA_Score'] = pd.NA
-        original_df['pLI'] = pd.NA
-        original_df['LOEUF'] = pd.NA
-        original_df['uSTART_CAP_DIST'] = pd.NA
-        rename_mapping = {
-        'ribo_sorfs_uORFdb': 'Ribo_seq',
-        'translation': 'Translation',
-        'type': 'Splicing_CSQ'
-        }
-        original_df.rename(columns={k: v for k, v in rename_mapping.items() if k in original_df.columns}, inplace=True)
-        # Save the empty (or original) DataFrame to the output file
-        original_df.to_csv(output_file, sep='\t', index=False)
-        return
-
+    
     # Adding LOEUF and pLI gene annotation
     pLI_file = os.path.join(os.path.expanduser(data_dir), "pli_LOEUFByGene.tsv")
     pLI_data = pd.read_csv(pLI_file, sep="\t").drop_duplicates(subset="GENE")
@@ -75,8 +52,58 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     input_df = input_df.merge(pLI_data, on="GENE", how="left", sort=False).set_index(input_df.index)
     input_df['pLI'] = pd.to_numeric(input_df['pLI'], errors='coerce')
 
-    # Imputing Missing Values
+    rename_mapping = {
+        'ribo_sorfs_uORFdb': 'Ribo_seq',
+        'translation': 'Translation',
+        'type': 'Splicing_CSQ'
+    }
 
+    input_df.rename(columns={k: v for k, v in rename_mapping.items() if k in input_df.columns}, inplace=True)
+
+    # Backup the original dataframe before modifications
+    original_df = input_df.copy()
+
+    columns_to_keep = ['Translation', '5UTR_LENGTH', 'mKOZAK_STRENGTH', 'uORF_count',
+        'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTOP_CODON', 'uORF_TYPE',
+        'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_rank', 'uSTART_PHYLOP',
+        'uSTART_PHASTCONS', 'uSTART_CAP_DIST', 'CSQ', 'GENE', 'pLI', 'LOEUF']
+    
+    input_df = input_df[columns_to_keep]
+    input_df = filter_and_transform(input_df)
+
+    if input_df.empty:
+        print("No variant to score. Exiting.")
+        if mane:
+            original_df = original_df[original_df['MANE'] != '[]']
+
+        # Select columns to keep, ensuring they exist in the DataFrame
+        if full_anno:
+            columns_order_to_keep = [
+            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
+            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', 'GENE', 
+            'TRANSCRIPT', 'MANE', '5UTR_START', '5UTR_END', 'STRAND', '5UTR_LENGTH', 
+            'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 'uORF_count', 'Overlapping_count', 
+            'Nterminal_count', 'NonOverlapping_count', 'uORF_START', 'uORF_END', 
+            'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTART_CAP_DIST', 'uSTOP_CODON', 
+            'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_AA_LENGTH', 
+            'uORF_rank', 'uSTART_PHYLOP', 'uSTART_PHASTCONS', 'pLI', 'LOEUF'
+            ]
+        else:
+            columns_order_to_keep = [
+            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 
+            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ',
+            'GENE', 'TRANSCRIPT'
+            ]
+
+        # Keep only existing columns
+        columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
+        original_df = original_df[columns_to_keep]
+
+        # Save the results
+        original_df.to_csv(output_file, sep='\t', index=False)
+        return True
+
+    # Imputing Missing Values
     impute_columns = ['pLI', 'LOEUF', 'uSTART_PHYLOP', 'uSTART_PHASTCONS']
     median_imputer = SimpleImputer(strategy='median')
     input_df[impute_columns] = median_imputer.fit_transform(input_df[impute_columns])
@@ -101,11 +128,11 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         input_df = pd.concat([input_df, encoded_df_input], axis=1)
 
     # Label Encode other categorical features using the same mappings as in training
-    label_encoded_columns = ['translation', 'mKOZAK_STRENGTH', 'ribo_sorfs_uORFdb', 'uSTOP_CODON', 'uORF_TYPE', 'uKOZAK_STRENGTH']
+    label_encoded_columns = ['Translation', 'mKOZAK_STRENGTH', 'Ribo_seq', 'uSTOP_CODON', 'uORF_TYPE', 'uKOZAK_STRENGTH']
     mapping = {
-        'translation': {'increased': 0, 'N-terminal extension': 1, 'decreased': 2},
+        'Translation': {'increased': 0, 'N-terminal extension': 1, 'decreased': 2},
         'mKOZAK_STRENGTH': {'Weak': 0, 'Adequate': 1, 'Strong': 2},
-        'ribo_sorfs_uORFdb': {1: 0, 101: 1, 100: 1, 111: 2, 11: 1, 10: 1, 110: 2, 0: 1},
+        'Ribo_seq': {1: 0, 101: 1, 100: 1, 111: 2, 11: 1, 10: 1, 110: 2, 0: 1},
         'uSTOP_CODON': {'TAA': 3, 'TAG': 2, 'TGA': 1, 'TGA > TGA':0, 'TAG > TAG':0, 'TAA > TGA':3, 'TAG > TAA':1,
                         'TAA > TAA':0, 'TAG > TGA':2, 'TGA > TAA':3, 'TGA > TAG':2, 'TAA > TAG':1},
         'uORF_TYPE': {'N-terminal extension': 1, 'Non-Overlapping': 0, 'Overlapping': 2},
@@ -130,23 +157,9 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     # Add the predicted probabilities to the processed dataframe
     input_df['5ULTRA_Score'] = y_pred_proba
     ultra_score = input_df[['5ULTRA_Score']]
-    pLI = input_df[['pLI']]
-    LOEUF = input_df[['LOEUF']]
-    CAP = input_df[['uSTART_CAP_DIST']]
 
     # Merge scores back into the original dataframe
     original_df = original_df.merge(ultra_score, left_index=True, right_index=True, how="left")
-    original_df = original_df.merge(pLI, left_index=True, right_index=True, how="left")
-    original_df = original_df.merge(LOEUF, left_index=True, right_index=True, how="left")
-    original_df = original_df.merge(CAP, left_index=True, right_index=True, how="left")
-    # Rename columns only if they exist
-    rename_mapping = {
-        'ribo_sorfs_uORFdb': 'Ribo_seq',
-        'translation': 'Translation',
-        'type': 'Splicing_CSQ'
-    }
-
-    original_df.rename(columns={k: v for k, v in rename_mapping.items() if k in original_df.columns}, inplace=True)
     original_df['Ribo_seq'] = original_df['Ribo_seq'].map({
         1: False, 101: True, 100: True, 111: True, 11: True, 
         10: True, 110: True, 0: 'New uORF'
@@ -180,6 +193,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
 
     # Save the results
     original_df.to_csv(output_file, sep='\t', index=False)
+    return True
 
 def main():
     import argparse

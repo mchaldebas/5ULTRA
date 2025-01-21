@@ -14,17 +14,37 @@ from .scripts.spliceai1 import process_spliceai_1
 from .scripts.spliceai2 import process_variants_spliceai_2
 from .scripts.spliceai3 import process_variants_spliceai_3
 
+import argparse
+
 def get_options():
     parser = argparse.ArgumentParser(
-        description="Process VCF/TSV files with optional SpliceAI processing."
+        prog="5ULTRA",
+        description=(
+            "5ULTRA: Computational pipeline designed to annotate and score genetic variants located in the 5′UTR"
+        ),
+        epilog="Example: 5ULTRA -I input.vcf -O output.tsv --splice --full",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument('-I', metavar='input', nargs='?', required=True,
-                        help='Path to the input VCF/TSV file')
-    parser.add_argument('-O', metavar='output', nargs='?', help='Path to the output TSV file')
-    parser.add_argument('--splice', action='store_true', help='Enable SpliceAI processing')
-    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory')
-    parser.add_argument('--full', action='store_true', help='Enable full annotation')
-    parser.add_argument('--mane', action='store_true', help='focus on MANE transcripts')
+    # Input/Output arguments
+    io_group = parser.add_argument_group("Input/Output options")
+    io_group.add_argument('-I', metavar='input', required=True,
+                          help='Path to the input VCF/TSV file (required)')
+    io_group.add_argument('-O', metavar='output',
+                          help='Path to the output TSV file (optional)')
+    # Processing options
+    proc_group = parser.add_argument_group("Processing options")
+    proc_group.add_argument('--splice', action='store_true',
+                            help='Enable SpliceAI processing')
+    proc_group.add_argument('--full', action='store_true',
+                            help='Enable full annotation')
+    proc_group.add_argument('--mane', action='store_true',
+                            help='Focus on MANE (Matched Annotation from the NCBI and EMBL-EBI) transcripts')
+    # Advanced options
+    advanced_group = parser.add_argument_group("Advanced options")
+    advanced_group.add_argument('--data-dir', metavar='data_path', type=str,
+                                default='~/.5ULTRA/data',
+                                help='Path to the data directory for SpliceAI resources')
+
     args = parser.parse_args()
     return args
 
@@ -131,7 +151,9 @@ def main():
         start_time = time.time()
         logging.info("Running scoring...")
         try:
-            score_variants(scoring_input, output_file, data_dir, full_anno, mane)
+            res = score_variants(scoring_input, output_file, data_dir, full_anno, mane)
+            if not res:
+                sys.exit(1)
         except Exception as e:
             logging.error(f"Scoring failed with error: {e}")
             sys.exit(1)

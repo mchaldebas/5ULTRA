@@ -49,15 +49,24 @@ The **5ULTRA** pipeline filters variants that reside within the 5′ UTR region 
 
 ### Steps
 
-1. **Install from PyPI**  
-```bash
-pip install fiveULTRA
-```
-2. **Download Required Data** (default path: ~/.5ULTRA/data)
-```bash
-5ULTRA-download-data [--data-dir [path/to/data]]
-```
-**Note**: Ensure you have sufficient disk space. current: **7Gb**
+1.  **Clone the repository**  
+    ```bash
+    git clone https://github.com/mchaldebas/5ULTRA.git
+    ```
+2.  **Navigate into the 5ULTRA directory**  
+    ```bash
+    cd 5ULTRA
+    ```
+3.  **Install locally via pip**  
+    ```bash
+    pip install .
+    ```
+4.  **Download Required Data** (default path: ~/.5ULTRA/data)
+    ```bash
+    5ULTRA-download-data [--data-dir [path/to/data]]
+    ```
+    Specify --data-dir if you wish to store reference data in a non-default location.
+**Note**: Ensure you have ~7 GB of available disk space to accommodate all reference data.
 ## Usage
 Once installed, **5ULTRA** can be run directly as a command-line tool:
 ```bash

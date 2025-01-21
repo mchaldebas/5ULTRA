@@ -61,7 +61,11 @@ The **5ULTRA** pipeline filters variants that reside within the 5′ UTR region 
     ```bash
     pip install .
     ```
-4.  **Download Required Data** (default path: ~/.5ULTRA/data)
+4.  **Test installation**
+    ```bash
+    5ULTRA -h
+    ```
+5.  **Download Required Data** (default path: ~/.5ULTRA/data)
     ```bash
     5ULTRA-download-data [--data-dir [path/to/data]]
     ```

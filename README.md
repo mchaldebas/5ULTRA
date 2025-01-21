@@ -84,7 +84,7 @@ Once installed, **5ULTRA** can be run directly as a command-line tool:
 - ```--data-dir [path/to/data]```: Path to the data directory. Defaults to ~/.5ULTRA/data if not specified.
 - ```--splice```: Enable SpliceAI processing and outputs on the variants with impact on splicing.
 - ```--full```: Outputs a more detailed annotation (see Full Annotation columns under [Input and Output File Format](#input-and-output-file-format)).
--```--mane```: Outputs only the variants affecting MANE transcripts
+- ```--mane```: Outputs only the variants affecting MANE transcripts
 ### Examples
 #### Basic Usage
 ```bash

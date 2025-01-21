@@ -17,7 +17,7 @@ def filter_and_transform(df):
     }).fillna(df['uORF_TYPE'])
     return df
 
-def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno=False):
+def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno=False, mane=False):
     """
     Scores the variants in the input file and writes the results to the output file.
 
@@ -151,6 +151,9 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         1: False, 101: True, 100: True, 111: True, 11: True, 
         10: True, 110: True, 0: 'New uORF'
     })
+
+    if mane:
+        original_df = original_df[original_df['MANE'] != '[]']
 
     # Select columns to keep, ensuring they exist in the DataFrame
     if full_anno:

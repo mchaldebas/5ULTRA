@@ -24,6 +24,7 @@ def get_options():
     parser.add_argument('--splice', action='store_true', help='Enable SpliceAI processing')
     parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory')
     parser.add_argument('--full', action='store_true', help='Enable full annotation')
+    parser.add_argument('--mane', action='store_true', help='focus on MANE transcripts')
     args = parser.parse_args()
     return args
 
@@ -34,6 +35,7 @@ def main():
     output_file = args.O
     data_dir = args.data_dir
     full_anno = args.full
+    mane = args.mane
     cutoff = 0.2
     # Assign default output file if not provided
     if not output_file:
@@ -129,7 +131,7 @@ def main():
         start_time = time.time()
         logging.info("Running scoring...")
         try:
-            score_variants(scoring_input, output_file, data_dir, full_anno)
+            score_variants(scoring_input, output_file, data_dir, full_anno, mane)
         except Exception as e:
             logging.error(f"Scoring failed with error: {e}")
             sys.exit(1)

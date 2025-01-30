@@ -11,7 +11,7 @@ def parse_spliceai_info(info_field):
             return entry[len('SpliceAI='):]
     return None
 
-def process_variant_spliceai_1(chrom, pos, ref, alt, snv_vcf, indel_vcf):
+def process_variant_spliceai_1(chrom, pos, ref, alt, snv_vcf):
     """
     Processes a single variant by querying SpliceAI annotations from VCF files.
 
@@ -21,7 +21,6 @@ def process_variant_spliceai_1(chrom, pos, ref, alt, snv_vcf, indel_vcf):
     - ref: Reference allele (string).
     - alt: Alternate allele (string).
     - snv_vcf: pysam.TabixFile object for SNV VCF.
-    - indel_vcf: pysam.TabixFile object for indel VCF.
 
     Returns:
     - List of SpliceAI annotations.
@@ -47,9 +46,6 @@ def process_variant_spliceai_1(chrom, pos, ref, alt, snv_vcf, indel_vcf):
     # Query SNV VCF
     if len(ref) == 1 and len(alt) == 1:
         query_vcf(snv_vcf)
-    # If not found, query indel VCF
-    else:
-        query_vcf(indel_vcf)
 
     return spliceai_results
 
@@ -68,17 +64,13 @@ def process_spliceai_1(input_file, output_file, data_dir='~/.5ULTRA/data', cutof
         raise FileNotFoundError(f"Input file '{input_file}' not found.")
 
     # Paths to SpliceAI VCF files
-    snv_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai50.5UTRs.raw.snvs.hg38.vcf.gz")
-    indel_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai50.5UTRs.raw.indels.hg38.vcf.gz")
+    snv_vcf_path = os.path.join(os.path.expanduser(data_dir), "spliceai100.5UTRs.raw.snvs.hg38.vcf.gz")
 
     if not os.path.isfile(snv_vcf_path):
         raise FileNotFoundError(f"SNV VCF file '{snv_vcf_path}' not found.")
-    if not os.path.isfile(indel_vcf_path):
-        raise FileNotFoundError(f"Indel VCF file '{indel_vcf_path}' not found.")
 
     # Open VCF files using pysam
     snv_vcf = pysam.TabixFile(snv_vcf_path)
-    indel_vcf = pysam.TabixFile(indel_vcf_path)
 
     with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
         # Write the header line to the output file
@@ -100,7 +92,7 @@ def process_spliceai_1(input_file, output_file, data_dir='~/.5ULTRA/data', cutof
             alt = fields[4]
 
             # Process variant
-            spliceai_annotations = process_variant_spliceai_1(chrom, pos, ref, alt, snv_vcf, indel_vcf)
+            spliceai_annotations = process_variant_spliceai_1(chrom, pos, ref, alt, snv_vcf)
 
             # Process each SpliceAI annotation
             for annotation in spliceai_annotations:
@@ -118,7 +110,6 @@ def process_spliceai_1(input_file, output_file, data_dir='~/.5ULTRA/data', cutof
 
     # Close VCF files
     snv_vcf.close()
-    indel_vcf.close()
 
 # Optional main function to allow script execution directly
 def main():

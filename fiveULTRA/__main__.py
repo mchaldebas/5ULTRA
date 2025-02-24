@@ -30,7 +30,8 @@ def get_options():
     io_group.add_argument('-I', metavar='input', required=True,
                           help='Path to the input VCF/TSV file (required)')
     io_group.add_argument('-O', metavar='output',
-                          help='Path to the output TSV file (optional)')
+                          help='Path to the output TSV file (optional)',
+                         default='<input_file>.5ULTRA.tsv')
     # Processing options
     proc_group = parser.add_argument_group("Processing options")
     proc_group.add_argument('--splice', action='store_true',

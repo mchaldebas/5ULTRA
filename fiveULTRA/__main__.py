@@ -14,8 +14,6 @@ from .scripts.spliceai1 import process_spliceai_1
 from .scripts.spliceai2 import process_variants_spliceai_2
 from .scripts.spliceai3 import process_variants_spliceai_3
 
-import argparse
-
 def get_options():
     parser = argparse.ArgumentParser(
         prog="5ULTRA",
@@ -53,14 +51,17 @@ def main():
     args = get_options()
     splice = args.splice
     input_file = args.I
-    output_file = args.O
+    output_file = args.O  
     data_dir = args.data_dir
     full_anno = args.full
     mane = args.mane
     cutoff = 0.2
-    # Assign default output file if not provided
+
+    # Define 'base' *always* based on input_file
+    base, _ = os.path.splitext(os.path.basename(input_file))
+
+    # Assign default output file if not provided, *using* base
     if not output_file:
-        base, _ = os.path.splitext(input_file)
         output_file = f"{base}.5ULTRA.tsv"
 
     # Set up logging
@@ -114,10 +115,10 @@ def main():
         # Conditional SpliceAI Processing
         if splice:
             # spliceai Detection processing
-            output_file = f"{base}.5ULTRA_splice.tsv"
-            splice_1_output = os.path.join(tmp_dir, f"splice1.5UTR.{os.path.basename(output_file)}")
-            splice_2_output = os.path.join(tmp_dir, f"splice2.5UTR.{os.path.basename(output_file)}")
-            splice_3_output = os.path.join(tmp_dir, f"splice3.5UTR.{os.path.basename(output_file)}")
+            # Use consistent naming for splice output files
+            splice_1_output = os.path.join(tmp_dir, f"splice1.5UTR.{base}.tsv")
+            splice_2_output = os.path.join(tmp_dir, f"splice2.5UTR.{base}.tsv")
+            splice_3_output = os.path.join(tmp_dir, f"splice3.5UTR.{base}.tsv")
             start_time = time.time()
             logging.info("Running splice detection on filtered output...")
             try:
@@ -132,7 +133,7 @@ def main():
             scoring_input = splice_3_output
         else:
             # Detection processing
-            detection_output = os.path.join(tmp_dir, f"Detection.5UTR.{os.path.basename(output_file)}")
+            detection_output = os.path.join(tmp_dir, f"Detection.5UTR.{base}.tsv") # Use base here too
             start_time = time.time()
             logging.info("Running detection on filtered output...")
             try:
@@ -152,6 +153,7 @@ def main():
         start_time = time.time()
         logging.info("Running scoring...")
         try:
+            # Always use the user-specified or default output_file
             res = score_variants(scoring_input, output_file, data_dir, full_anno, mane)
             if not res:
                 sys.exit(1)

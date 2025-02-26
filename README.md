@@ -83,7 +83,7 @@ Once installed, **5ULTRA** can be run directly as a command-line tool:
 - ```-O [output]```: Path for the output TSV file. Defaults to <input_file>.5ULTRA.tsv if not specified.
 - ```--data-dir [path/to/data]```: Path to the data directory. Defaults to ~/.5ULTRA/data if not specified.
 - ```--splice```: Enable SpliceAI processing and outputs on the variants with impact on splicing.
-- ```--full```: Outputs a more detailed annotation (see [Input and Output File Format](#input-and-output-file-format)).
+- ```--full```: Outputs a more detailed annotation (see [Input and Output File Format](#input-and-output-file-format)) and all other columns from the input.
 - ```--mane```: Outputs only the variants affecting MANE transcripts
 ### Examples
 #### Basic Usage

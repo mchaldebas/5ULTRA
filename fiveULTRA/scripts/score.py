@@ -78,6 +78,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
 
         # Select columns to keep, ensuring they exist in the DataFrame
         if full_anno:
+            columns_to_remove = ["mSTART", "mSTART_CODON", "minimum_uORF_mSTART_DIST", "uSTART_CODON", "uORF_SEQ"]
             columns_order_to_keep = [
             '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
             'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', 'GENE', 
@@ -88,16 +89,20 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
             'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_AA_LENGTH', 
             'uORF_rank', 'uSTART_PHYLOP', 'uSTART_PHASTCONS', 'pLI', 'LOEUF'
             ]
+            columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
+            remaining_columns = [col for col in original_df.columns if col not in columns_to_keep]
+            columns_to_keep.extend(remaining_columns)
+            original_df = original_df[columns_to_keep]
+            original_df = original_df.drop(columns=columns_to_remove, errors='ignore')
+
         else:
             columns_order_to_keep = [
             '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 
             'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ',
             'GENE', 'TRANSCRIPT'
             ]
-
-        # Keep only existing columns
-        columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
-        original_df = original_df[columns_to_keep]
+            columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
+            original_df = original_df[columns_to_keep]
 
         # Save the results
         original_df.to_csv(output_file, sep='\t', index=False)
@@ -170,6 +175,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
 
     # Select columns to keep, ensuring they exist in the DataFrame
     if full_anno:
+        columns_to_remove = ["mSTART", "mSTART_CODON", "minimum_uORF_mSTART_DIST", "uSTART_CODON", "uORF_SEQ"]
         columns_order_to_keep = [
             '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
             'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', 'GENE', 
@@ -180,16 +186,20 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
             'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_AA_LENGTH', 
             'uORF_rank', 'uSTART_PHYLOP', 'uSTART_PHASTCONS', 'pLI', 'LOEUF'
         ]
+        columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
+        remaining_columns = [col for col in original_df.columns if col not in columns_to_keep]
+        columns_to_keep.extend(remaining_columns)
+        original_df = original_df[columns_to_keep]
+        original_df = original_df.drop(columns=columns_to_remove, errors='ignore')
+
     else:
         columns_order_to_keep = [
             '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 
             'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ',
             'GENE', 'TRANSCRIPT'
         ]
-
-    # Keep only existing columns
-    columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
-    original_df = original_df[columns_to_keep]
+        columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
+        original_df = original_df[columns_to_keep]
 
     # Save the results
     original_df.to_csv(output_file, sep='\t', index=False)

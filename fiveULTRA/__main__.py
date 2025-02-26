@@ -29,7 +29,7 @@ def get_options():
                           help='Path to the input VCF/TSV file (required)')
     io_group.add_argument('-O', metavar='output',
                           help='Path to the output TSV file (optional)',
-                         default='<input_file>.5ULTRA.tsv')
+                         default='Variants.5ULTRA.tsv')
     # Processing options
     proc_group = parser.add_argument_group("Processing options")
     proc_group.add_argument('--splice', action='store_true',
@@ -60,9 +60,8 @@ def main():
     # Define 'base' *always* based on input_file
     base, _ = os.path.splitext(os.path.basename(input_file))
 
-    # Assign default output file if not provided, *using* base
-    if not output_file:
-        output_file = f"{base}.5ULTRA.tsv"
+    if splice and output_file == 'Variants.5ULTRA.tsv':
+        output_file = f"{base}.5ULTRA.splice.tsv"
 
     # Set up logging
     logging.basicConfig(level=logging.INFO, format='%(message)s')

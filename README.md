@@ -103,7 +103,7 @@ This command reads test-variants.tsv, filters for 5′ UTR variants, annotates t
 This command uses custom data paths, analyse only splicing variants of MANE transcripts, and produces a fully annotated output with additional columns.
 ## Pipeline Workflow
 
-![Picture1](https://github.com/user-attachments/assets/872be390-4b58-42ea-93a4-0faa70ff090f)
+![Picture1](https://github.com/user-attachments/assets/57741253-0973-49d6-a5cb-5e2341f98022)
 
 ## Input and Output File Format
 

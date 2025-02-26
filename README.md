@@ -65,7 +65,7 @@ The **5ULTRA** pipeline filters variants that reside within the 5′ UTR region 
     ```bash
     5ULTRA -h
     ```
-5.  **Download Required Data** (default path: ~/.5ULTRA/data)
+5.  **Download Required Data** (default path: in a hidden directory .5ULTRA/data in your home directory)
     ```bash
     5ULTRA-download-data [--data-dir [path/to/data]]
     ```
@@ -101,6 +101,10 @@ This command reads test-variants.tsv, filters for 5′ UTR variants, annotates t
         --full
 ```
 This command uses custom data paths, analyse only splicing variants of MANE transcripts, and produces a fully annotated output with additional columns.
+## Pipeline Workflow
+
+![Picture1](https://github.com/user-attachments/assets/872be390-4b58-42ea-93a4-0faa70ff090f)
+
 ## Input and Output File Format
 
 - ***Input***: **VCF** or **TSV** file with genetic variants. (#CHROM, POS, ID, REF, ALT)

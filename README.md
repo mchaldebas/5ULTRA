@@ -138,7 +138,7 @@ When --full is specified, additional columns are appended:
     - **uORF_rank**: Relative rank based on proximity to the CDS.
     - **uSTART_PHYLOP / uSTART_PHASTCONS**: Conservation scores (PhyloP, PhastCons).
     - **pLI / LOEUF**: Gene-level intolerance metrics.
-
+    - Other columns from the input file.
 
 ## Reference
 

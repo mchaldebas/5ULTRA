@@ -40,17 +40,23 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     if input_df.empty:
         print("No variants were found to affect translation in the input file. Exiting.")
         return False
-    
+
     input_df['5UTR_LENGTH'] = pd.to_numeric(input_df['5UTR_LENGTH'], errors='coerce')
     input_df['uSTART_mSTART_DIST'] = pd.to_numeric(input_df['uSTART_mSTART_DIST'], errors='coerce')
     input_df['uSTART_CAP_DIST'] = input_df['5UTR_LENGTH'] - input_df['uSTART_mSTART_DIST']
-    
+
     # Adding LOEUF and pLI gene annotation
     pLI_file = os.path.join(os.path.expanduser(data_dir), "pli_LOEUFByGene.tsv")
     pLI_data = pd.read_csv(pLI_file, sep="\t").drop_duplicates(subset="GENE")
     pLI_data = pLI_data.drop_duplicates(subset="GENE")
-    input_df = input_df.merge(pLI_data, on="GENE", how="left", sort=False).set_index(input_df.index)
-    input_df['pLI'] = pd.to_numeric(input_df['pLI'], errors='coerce')
+    input_df = input_df.merge(pLI_data, on="GENE", how="left", sort=False, suffixes=('', '_PLI_DATA')) # Added suffixes
+    if 'pLI_PLI_DATA' in input_df.columns: # Check if the new pLI column exists with suffix
+        input_df['pLI'] = pd.to_numeric(input_df['pLI_PLI_DATA'], errors='coerce') # Rename the new column
+        input_df.drop(columns=['pLI_PLI_DATA'], inplace=True, errors='ignore') # Drop the suffixed column
+    else:
+        print("Error: Could not find merged pLI column (pLI_PLI_DATA). Check merge operation.") # Error message if something goes wrong
+        return False
+
 
     rename_mapping = {
         'ribo_sorfs_uORFdb': 'Ribo_seq',
@@ -67,7 +73,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTOP_CODON', 'uORF_TYPE',
         'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_rank', 'uSTART_PHYLOP',
         'uSTART_PHASTCONS', 'uSTART_CAP_DIST', 'CSQ', 'GENE', 'pLI', 'LOEUF']
-    
+
     input_df = input_df[columns_to_keep]
     input_df = filter_and_transform(input_df)
 
@@ -81,12 +87,12 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
             columns_to_remove = ["mSTART", "mSTART_CODON", "minimum_uORF_mSTART_DIST", "uSTART_CODON", "uORF_SEQ"]
             columns_order_to_keep = [
             '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
-            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', 'GENE', 
-            'TRANSCRIPT', 'MANE', '5UTR_START', '5UTR_END', 'STRAND', '5UTR_LENGTH', 
-            'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 'uORF_count', 'Overlapping_count', 
-            'Nterminal_count', 'NonOverlapping_count', 'uORF_START', 'uORF_END', 
-            'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTART_CAP_DIST', 'uSTOP_CODON', 
-            'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_AA_LENGTH', 
+            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', 'GENE',
+            'TRANSCRIPT', 'MANE', '5UTR_START', '5UTR_END', 'STRAND', '5UTR_LENGTH',
+            'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 'uORF_count', 'Overlapping_count',
+            'Nterminal_count', 'NonOverlapping_count', 'uORF_START', 'uORF_END',
+            'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTART_CAP_DIST', 'uSTOP_CODON',
+            'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_AA_LENGTH',
             'uORF_rank', 'uSTART_PHYLOP', 'uSTART_PHASTCONS', 'pLI', 'LOEUF'
             ]
             columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
@@ -97,7 +103,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
 
         else:
             columns_order_to_keep = [
-            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 
+            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
             'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ',
             'GENE', 'TRANSCRIPT'
             ]
@@ -166,7 +172,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     # Merge scores back into the original dataframe
     original_df = original_df.merge(ultra_score, left_index=True, right_index=True, how="left")
     original_df['Ribo_seq'] = original_df['Ribo_seq'].map({
-        1: False, 101: True, 100: True, 111: True, 11: True, 
+        1: False, 101: True, 100: True, 111: True, 11: True,
         10: True, 110: True, 0: 'New uORF'
     })
 
@@ -178,12 +184,12 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         columns_to_remove = ["mSTART", "mSTART_CODON", "minimum_uORF_mSTART_DIST", "uSTART_CODON", "uORF_SEQ"]
         columns_order_to_keep = [
             '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
-            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', 'GENE', 
-            'TRANSCRIPT', 'MANE', '5UTR_START', '5UTR_END', 'STRAND', '5UTR_LENGTH', 
-            'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 'uORF_count', 'Overlapping_count', 
-            'Nterminal_count', 'NonOverlapping_count', 'uORF_START', 'uORF_END', 
-            'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTART_CAP_DIST', 'uSTOP_CODON', 
-            'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_AA_LENGTH', 
+            'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ', 'GENE',
+            'TRANSCRIPT', 'MANE', '5UTR_START', '5UTR_END', 'STRAND', '5UTR_LENGTH',
+            'START_EXON', 'mKOZAK', 'mKOZAK_STRENGTH', 'uORF_count', 'Overlapping_count',
+            'Nterminal_count', 'NonOverlapping_count', 'uORF_START', 'uORF_END',
+            'Ribo_seq', 'uSTART_mSTART_DIST', 'uSTART_CAP_DIST', 'uSTOP_CODON',
+            'uORF_TYPE', 'uKOZAK', 'uKOZAK_STRENGTH', 'uORF_LENGTH', 'uORF_AA_LENGTH',
             'uORF_rank', 'uSTART_PHYLOP', 'uSTART_PHASTCONS', 'pLI', 'LOEUF'
         ]
         columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
@@ -194,10 +200,10 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
 
     else:
         columns_order_to_keep = [
-            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ', 
+            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'CSQ',
             'Translation', '5ULTRA_Score', 'SpliceAI', 'Splicing_CSQ',
             'GENE', 'TRANSCRIPT'
-        ]
+            ]
         columns_to_keep = [col for col in columns_order_to_keep if col in original_df.columns]
         original_df = original_df[columns_to_keep]
 

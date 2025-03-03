@@ -7,7 +7,7 @@ import gzip
 import shutil
 import time
 
-from .scripts.filter_input import filter_input
+from .scripts.filter_input import filter_input  # Use absolute imports
 from .scripts.detection import process_variants, load_vcf_data, load_tsv_data
 from .scripts.score import score_variants
 from .scripts.spliceai1 import process_spliceai_1
@@ -51,11 +51,14 @@ def main():
     args = get_options()
     splice = args.splice
     input_file = args.I
-    output_file = args.O  
+    output_file = args.O
     data_dir = args.data_dir
     full_anno = args.full
     mane = args.mane
     cutoff = 0.2
+
+    # Set up logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
     # Define 'base' *always* based on input_file
     base, _ = os.path.splitext(os.path.basename(input_file))
@@ -63,8 +66,6 @@ def main():
     if splice and output_file == 'Variants.5ULTRA.tsv':
         output_file = f"{base}.5ULTRA.splice.tsv"
 
-    # Set up logging
-    logging.basicConfig(level=logging.INFO, format='%(message)s')
 
     # Check if input file exists
     if not os.path.isfile(input_file):
@@ -90,7 +91,7 @@ def main():
                 logging.error(f"Failed to unzip '{input_file}': {e}")
                 sys.exit(1)
             end_time = time.time()
-            logging.info(f"Unzipping input file execution time:\t {int(end_time - start_time)} seconds")
+            logging.info(f"Unzipping input file execution time: {int(end_time - start_time)} seconds")
 
         # Paths to scripts and data
         required_data_file = os.path.join(os.path.expanduser(data_dir), '5UTRs.intervals.bed')
@@ -109,7 +110,7 @@ def main():
             sys.exit(1)
 
         end_time = time.time()
-        logging.info(f"5'UTR filtering execution time:\t {int(end_time - start_time)} seconds")
+        logging.info(f"5'UTR filtering execution time: {int(end_time - start_time)} seconds")
 
         # Conditional SpliceAI Processing
         if splice:
@@ -128,7 +129,7 @@ def main():
                 logging.error(f"splice Detection failed with error: {e}")
                 sys.exit(1)
             end_time = time.time()
-            logging.info(f"5'UTR splice detection execution time:\t {int(end_time - start_time)} seconds")
+            logging.info(f"5'UTR splice detection execution time: {int(end_time - start_time)} seconds")
             scoring_input = splice_3_output
         else:
             # Detection processing
@@ -145,7 +146,7 @@ def main():
                 logging.error(f"Detection failed with error: {e}")
                 sys.exit(1)
             end_time = time.time()
-            logging.info(f"5'UTR detection execution time:\t {int(end_time - start_time)} seconds")
+            logging.info(f"5'UTR detection execution time: {int(end_time - start_time)} seconds")
             scoring_input = detection_output
 
         # Run Scoring
@@ -161,13 +162,13 @@ def main():
             sys.exit(1)
 
         end_time = time.time()
-        logging.info(f"Scoring execution time:\t {int(end_time - start_time)} seconds")
+        logging.info(f"Scoring execution time: {int(end_time - start_time)} seconds")
 
     # Calculate and print total execution time
     end_time_total = time.time()
     total_time = int(end_time_total - start_time_total)
-    logging.info(f"Total execution time:\t {total_time} seconds")
-    logging.info(f"Results available:\t {output_file}")
+    logging.info(f"Total execution time: {total_time} seconds")
+    logging.info(f"Results available: {output_file}")
 
 if __name__ == '__main__':
     main()

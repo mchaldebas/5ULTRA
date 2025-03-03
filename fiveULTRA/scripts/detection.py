@@ -96,14 +96,26 @@ def calculate_kozak_strength(kozak_sequence):
         return 'Weak'
 
 def get_score(chrom, pos, file_path):
-    """Fetches conservation scores from tabix-indexed files."""
     try:
-        tabix_file = pysam.TabixFile(file_path)
-        records = tabix_file.fetch(chrom, pos - 1, pos)
-        for record in records:
-            return record.split('\t')[-1]
+        with pysam.TabixFile(file_path) as tabix_file:  
+            records = tabix_file.fetch(chrom, pos - 1, pos)
+            for record in records:
+                return record.split('\t')[-1]
+            return None
+    except OSError as e:
+        print(f"OSError accessing file: {e}")
         return None
-    except (OSError, ValueError, KeyError, pysam.TabixError):
+    except ValueError as e:
+        print(f"ValueError (likely malformed input): {e}")
+        return None
+    except KeyError as e:
+        print(f"KeyError (likely missing chromosome): {e}")
+        return None
+    except pysam.utils.SamtoolsError as e: 
+        print(f"Pysam/Samtools error: {e}")
+        return None
+    except Exception as e:
+        print(f"An unexpected error: {e}")
         return None
 
 def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR, data_dir):

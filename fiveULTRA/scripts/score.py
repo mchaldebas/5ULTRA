@@ -57,7 +57,6 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
         print("Error: Could not find merged pLI column (pLI_PLI_DATA). Check merge operation.") # Error message if something goes wrong
         return False
 
-
     rename_mapping = {
         'ribo_sorfs_uORFdb': 'Ribo_seq',
         'translation': 'Translation',

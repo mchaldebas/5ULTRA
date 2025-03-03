@@ -82,7 +82,7 @@ Once installed, **5ULTRA** can be run directly as a command-line tool:
 - ```-I```: Path to the input **VCF** or **TSV** file containing genetic variants.
 - ```-O [output]```: Path for the output TSV file. Defaults to <input_file>.5ULTRA.tsv if not specified.
 - ```--data-dir [path/to/data]```: Path to the data directory. Defaults to ~/.5ULTRA/data if not specified.
-- ```--splice```: Enable SpliceAI processing and outputs on the variants with impact on splicing.
+- ```--splice```: Enable SpliceAI processing and outputs on the variants with impact on splicing (SNVs only).
 - ```--full```: Outputs a more detailed annotation (see [Input and Output File Format](#input-and-output-file-format)) and all other columns from the input.
 - ```--mane```: Outputs only the variants affecting MANE transcripts
 ### Examples
@@ -100,7 +100,7 @@ This command reads test-variants.tsv, filters for 5′ UTR variants, annotates t
         --mane \\
         --full
 ```
-This command uses custom data paths, analyse only splicing variants of MANE transcripts, and produces a fully annotated output with additional columns.
+This command uses custom data path, analyse only splicing SNVs of MANE transcripts, and produces a fully annotated output with additional columns.
 ## Pipeline Workflow
 
 ![Picture1](https://github.com/user-attachments/assets/4fcdd53e-2b3b-4f76-a7d7-2821e133df9e)

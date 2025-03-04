@@ -65,7 +65,8 @@ def main():
 
     if splice and output_file == 'Variants.5ULTRA.tsv':
         output_file = f"{base}.5ULTRA.splice.tsv"
-
+    elif output_file == 'Variants.5ULTRA.tsv':
+        output_file = f"{base}.5ULTRA.tsv"
 
     # Check if input file exists
     if not os.path.isfile(input_file):

@@ -119,9 +119,55 @@ def process_variant_spliceai_2(variant, UTRs_by_gene, Introns_by_transcript, cut
                     result.append([CHR, newPOS, variant[2], newREF, newALT] + variant[5:] +
                                   [UTR[6], f'{CHR}_{POS}_{variant[2]}_{REF}_{ALT}', variant_type])
         else:  # strand == '-'
-            # Implement negative strand processing here
-            # For brevity, ensure you replicate the logic with appropriate adjustments for the '-' strand
-            pass
+            if AG_score >= cutoff:
+                if all(AL_POS not in range(t[0], t[1]+1) for t in exons): 
+                    continue
+                if AG_POS > AL_POS: 
+                    variant_type = 'AG_insertion_-'
+                    transcript_INTRONs = Introns_by_transcript.get(UTR[6], [])
+                    for intron in transcript_INTRONs:
+                        if AL_POS == int(intron[1]): 
+                            newPOS = int(intron[1]) 
+                            newREF = rev_seq(intron[11][0]) 
+                            newALT = rev_seq(intron[11][: AG_POS - AL_POS + 1]) 
+                            if AL_POS <= POS <= AG_POS and AL_POS <= POS + len(REF) - 1 <= AG_POS: 
+                                newALT = newALT[: AG_POS - POS] + ALT + newALT[AG_POS - POS + len(REF) -1 :] 
+                            result.append([CHR, newPOS, variant[2], newREF, newALT] + variant[5:] +
+                                          [UTR[6], f'{CHR}_{POS}_{variant[2]}_{REF}_{ALT}', variant_type])
+                elif AG_POS < AL_POS: 
+                    variant_type = 'AG_deletion_-'
+                    new = calculate_distance_from_five_cap(exons, strand, AG_POS) 
+                    old = calculate_distance_from_five_cap(exons, strand, AL_POS) 
+                    newPOS = AG_POS
+                    newREF = rev_seq(UTR[12][new - 1 : old]) 
+                    newALT = rev_seq(UTR[12][new - 1]) 
+                    result.append([CHR, newPOS, variant[2], newREF, newALT] + variant[5:] +
+                                      [UTR[6], f'{CHR}_{POS}_{variant[2]}_{REF}_{ALT}', variant_type])
+            if DG_score >= cutoff:
+                if all(DL_POS not in range(t[0], t[1]+1) for t in exons): 
+                    continue
+                if DG_POS < DL_POS: 
+                    variant_type = 'DG_insertion_-'
+                    transcript_INTRONs = Introns_by_transcript.get(UTR[6], [])
+                    for intron in transcript_INTRONs:
+                        if DL_POS == int(intron[2]): 
+                            newPOS = int(intron[1]) 
+                            newREF = rev_seq(intron[11][0])
+                            newALT = rev_seq(intron[11][: DL_POS - DG_POS + 1]) 
+                            if DG_POS <= POS <= DL_POS and DG_POS <= POS + len(REF) - 1 <= DL_POS: 
+                                newALT = newALT[: DL_POS - POS] + ALT + newALT[DL_POS - POS + len(REF) -1 :]
+                            result.append([CHR, newPOS, variant[2], newREF, newALT] + variant[5:] +
+                                          [UTR[6], f'{CHR}_{POS}_{variant[2]}_{REF}_{ALT}', variant_type])
+                elif DG_POS > DL_POS:
+                    variant_type = 'DG_deletion_-'
+                    new = calculate_distance_from_five_cap(exons, strand, DG_POS)
+                    old = calculate_distance_from_five_cap(exons, strand, DL_POS)
+                    newPOS = next((exons[i-1][1] for i in range(1, len(exons)) if exons[i][0] == DL_POS), None)
+                    if newPOS:
+                        newREF = UTR[12][old -1 : new]
+                        newALT = UTR[12][old -1]
+                        result.append([CHR, newPOS, variant[2], newREF, newALT] + variant[5:] +
+                                      [UTR[6], f'{CHR}_{POS}_{variant[2]}_{REF}_{ALT}', variant_type])
     return result
 
 def process_variants_spliceai_2(input_file, output_file_path, data_dir, cutoff):

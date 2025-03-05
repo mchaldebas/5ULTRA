@@ -80,7 +80,7 @@ def process_variant_spliceai_2(variant, UTRs_by_gene, Introns_by_transcript, cut
                             newREF = intron[11][0]
                             newALT = intron[11][0] + intron[11][AG_POS - AL_POS -1 : -1]
                             if AG_POS <= POS < AL_POS and AG_POS < POS + len(REF) -1 <= AL_POS:
-                                newALT = newALT[:POS - AG_POS] + ALT + newALT[POS - AG_POS + len(REF) -1 :]
+                                newALT = newALT[:POS - AG_POS +1] + ALT + newALT[POS - AG_POS + len(REF) +1 :]
                             result.append([CHR, newPOS, variant[2], newREF, newALT] + variant[5:] +
                                           [UTR[6], f'{CHR}_{POS}_{variant[2]}_{REF}_{ALT}', variant_type])
                 elif AG_POS > AL_POS:
@@ -106,7 +106,7 @@ def process_variant_spliceai_2(variant, UTRs_by_gene, Introns_by_transcript, cut
                             newREF = intron[11][0]
                             newALT = intron[11][: DG_POS - DL_POS +1]
                             if DL_POS <= POS <= DG_POS and DL_POS <= POS + len(REF) -1 <= DG_POS:
-                                newALT = newALT[: POS - DL_POS ] + ALT + newALT[POS - DL_POS + len(REF) -1 :]
+                                newALT = newALT[: POS - DL_POS ] + ALT + newALT[POS - DL_POS + len(REF) :]
                             result.append([CHR, newPOS, variant[2], newREF, newALT] + variant[5:] +
                                           [UTR[6], f'{CHR}_{POS}_{variant[2]}_{REF}_{ALT}', variant_type])
                 elif DG_POS < DL_POS:
@@ -155,7 +155,7 @@ def process_variant_spliceai_2(variant, UTRs_by_gene, Introns_by_transcript, cut
                             newREF = rev_seq(intron[11][-1])
                             newALT = newREF + rev_seq(intron[11][1: DL_POS - DG_POS + 1]) 
                             if DG_POS <= POS < DL_POS and DG_POS <= POS + len(REF) - 1 < DL_POS: 
-                                newALT = newALT[: DL_POS - POS] + ALT + newALT[DL_POS - POS + len(REF) -1 :]
+                                newALT = newALT[:POS - DG_POS +1] + ALT + newALT[POS - DG_POS + len(REF) +1:]
                             result.append([CHR, newPOS, variant[2], newREF, newALT] + variant[5:] +
                                           [UTR[6], f'{CHR}_{POS}_{variant[2]}_{REF}_{ALT}', variant_type])
                 elif DG_POS > DL_POS:

@@ -118,7 +118,7 @@ def get_score(chrom, pos, file_path):
         print(f"An unexpected error: {e}")
         return None
 
-def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR, data_dir):
+def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR, data_dir, POS, type, wtSEQ):
     """Annotates created uORFs (uStart gain)."""
     uORF_START = relativePosition - 2
     while mutatedSequence[uORF_START: uORF_START + 3] != 'ATG':
@@ -133,7 +133,31 @@ def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR,
     uKOZAK = mutatedSequence[uORF_START - 4: uORF_START + 5]
     uKOZAK_STRENGTH = calculate_kozak_strength(uKOZAK)
     uORF_LENGTH = uORF_END - uORF_START + 1 if uORF_TYPE != 'N-terminal extension' else startPOS - uORF_START
-    uORF_START_GENOMIC = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_START)
+    if type == 'DG_insertion_+':
+        uORF_START_GENOMIC = POS + (uORF_START - calculate_distance_from_five_cap(exons, STRAND, POS))
+        uORF_END_GENOMIC = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_END)
+    elif type == 'DG_insertion_-':
+        POS_exon = 0
+        while exons[POS_exon][1] < POS:
+            POS_exon += 1
+        POS_exon += 1
+        intron_end = exons[POS_exon][0]
+        uORF_START_GENOMIC = POS + (intron_end - POS - uORF_START+ calculate_distance_from_five_cap(exons, STRAND, POS)) -1
+        uORF_END_GENOMIC = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_END)
+    elif type == 'AG_insertion_+':
+        POS_exon = 0
+        while exons[POS_exon][1] < POS:
+            POS_exon += 1
+        POS_exon += 1
+        intron_end = exons[POS_exon][0]
+        uORF_START_GENOMIC = POS + (intron_end -POS +uORF_START -calculate_distance_from_five_cap(exons, STRAND, POS) - (len(mutatedSequence) - len(wtSEQ))) -1
+        uORF_END_GENOMIC = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_END)
+    elif type == 'AG_insertion_-':
+        uORF_START_GENOMIC = POS + (len(mutatedSequence) - len(wtSEQ) -uORF_START +calculate_distance_from_five_cap(exons, STRAND, POS))
+        uORF_END_GENOMIC = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_END)
+    else: 
+        uORF_START_GENOMIC = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_START)
+        uORF_END_GENOMIC = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_END)
     if STRAND == '+':
         pos1, pos2, pos3 = uORF_START_GENOMIC, uORF_START_GENOMIC + 1, uORF_START_GENOMIC + 2
     else:
@@ -152,7 +176,6 @@ def uStart_gain(relativePosition, mutatedSequence, startPOS, STRAND, exons, CHR,
     ]
     phastCons_scores = [float(score) for score in phastCons_scores if score and is_valid_number(score)]
     mean_phastcons = sum(phastCons_scores) / len(phastCons_scores) if phastCons_scores else "NA"
-    uORF_END_GENOMIC = calculate_genomic_position_from_five_cap(exons, STRAND, uORF_END)
     return [
         uORF_START_GENOMIC, uORF_END_GENOMIC, '000', uSTART_mSTART_DIST, 'ATG',
         uSTOP_CODON, uORF_TYPE, uKOZAK, uKOZAK_STRENGTH,
@@ -209,14 +232,14 @@ def process_variant_spliceai_3(variant, utrs_by_transcript, uorfs_by_transcript,
         # uStart gain
         if 'ATG' in mutatedSequence[relativePosition-2: relativePosition+len(ALT)+2] and 'ATG' not in wtSEQ[ relativePosition-2: relativePosition+len(REF)+2]:
             CSQ[0].extend(['uStart_gain'])
-            Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR, data_dir)
+            Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR, data_dir, POS, variant[-1], wtSEQ)
             uORFAnnotations += [Anno]
             if uORFAnnotations[-1][6] != 'N-terminal extension':
                 CSQ[1].extend(['decreased'])
             else: CSQ[1].extend(['N-terminal extension'])
         elif relativePosition < 2 and 'ATG' in mutatedSequence[: relativePosition+len(ALT)+2] and 'ATG' not in wtSEQ[: relativePosition+len(REF)+2]:
             CSQ[0].append('uStart_gain')
-            Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR, data_dir)
+            Anno = uStart_gain(relativePosition, mutatedSequence, startPOS, UTR[3], exons, CHR, data_dir, POS, variant[-1], wtSEQ)
             uORFAnnotations.append(Anno)
             CSQ[1].append('N-terminal extension' if uORFAnnotations[-1][6] == 'N-terminal extension' else 'decreased')
         # check if 5UTR has existing uORF(s)

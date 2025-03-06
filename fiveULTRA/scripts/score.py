@@ -142,7 +142,7 @@ def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno
     mapping = {
         'Translation': {'increased': 0, 'N-terminal extension': 1, 'decreased': 2},
         'mKOZAK_STRENGTH': {'Weak': 0, 'Adequate': 1, 'Strong': 2},
-        'Ribo_seq': {1: 0, 101: 1, 100: 1, 111: 2, 11: 1, 10: 1, 110: 2, 0: 1},
+        'Ribo_seq': {'False':0, 'New uORF':1, 'True':2},
         'uSTOP_CODON': {'TAA': 3, 'TAG': 2, 'TGA': 1, 'TGA > TGA':0, 'TAG > TAG':0, 'TAA > TGA':3, 'TAG > TAA':1,
                         'TAA > TAA':0, 'TAG > TGA':2, 'TGA > TAA':3, 'TGA > TAG':2, 'TAA > TAG':1},
         'uORF_TYPE': {'N-terminal extension': 1, 'Non-Overlapping': 0, 'Overlapping': 2},

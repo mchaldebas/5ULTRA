@@ -210,7 +210,7 @@ def main():
     parser = argparse.ArgumentParser(description='Process variants with SpliceAI annotations.')
     parser.add_argument('input_file', type=str, help='Path to the input variants file.')
     parser.add_argument('output_file', type=str, help='Path to the output file.')
-    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory.')
+    parser.add_argument('--data-dir', type=str, default=os.path.join(os.path.expanduser("~"), ".5ULTRA", "data"), help='Path to the data directory.')
     parser.add_argument('--cutoff', type=float, default=0.2, help='Cutoff value for scores.')
     args = parser.parse_args()
 

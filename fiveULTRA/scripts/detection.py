@@ -335,7 +335,7 @@ def main():
     parser = argparse.ArgumentParser(description='Detect variants.')
     parser.add_argument('input_file_path', type=str, help='Path to the filtered input file.')
     parser.add_argument('output_file_path', type=str, help='Path to the detection output file.')
-    parser.add_argument('--data-dir', type=str, default='./data', help='Path to the data directory.')
+    parser.add_argument('--data-dir', type=str, default=os.path.join(os.path.expanduser("~"), ".5ULTRA", "data"), help='Path to the data directory.')
     args = parser.parse_args()
     if args.input_file_path.endswith('.vcf'):
         variants = load_vcf_data(args.input_file_path)

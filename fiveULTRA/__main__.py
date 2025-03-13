@@ -41,7 +41,7 @@ def get_options():
     # Advanced options
     advanced_group = parser.add_argument_group("Advanced options")
     advanced_group.add_argument('--data-dir', metavar='data_path', type=str,
-                                default='~/.5ULTRA/data',
+                                default=os.path.join(os.path.expanduser("~"), ".5ULTRA", "data"),
                                 help='Path to the data directory for SpliceAI resources')
 
     args = parser.parse_args()

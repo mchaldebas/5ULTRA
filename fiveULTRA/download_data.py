@@ -7,10 +7,10 @@ def main():
     parser = argparse.ArgumentParser(
         description="Download necessary data for 5ULTRA"
     )
-    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory')
+    parser.add_argument('--data-dir', type=str, default=os.path.join(os.path.expanduser("~"), ".5ULTRA", "data"), help='Path to the data directory')
     args = parser.parse_args()
     data_dir = args.data_dir
-    url = 'https://test.test/data.zip'
+    url = 'https://www.dropbox.com/scl/fo/pj5ls1m8f9gvc6b13tqle/AHHge_c_7gZHtn15ogomSOQ?rlkey=n233zz0nbmz1z9qhyihspkcmi&st=j7xz1038&dl=1'
     local_filename = 'data.zip'
 
     # Ensure the target directory exists

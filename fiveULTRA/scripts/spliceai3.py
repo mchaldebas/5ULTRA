@@ -364,7 +364,7 @@ def main():
     parser = argparse.ArgumentParser(description='Detect variants.')
     parser.add_argument('input_file_path', type=str, help='Path to the filtered input file.')
     parser.add_argument('output_file_path', type=str, help='Path to the detection output file.')
-    parser.add_argument('--data-dir', type=str, default='~/.5ULTRA/data', help='Path to the data directory.')
+    parser.add_argument('--data-dir', type=str, default=os.path.join(os.path.expanduser("~"), ".5ULTRA", "data"), help='Path to the data directory.')
     args = parser.parse_args()
 
     process_variants_spliceai_3(args.input_file_path, args.output_file_path, data_dir=args.data_dir)

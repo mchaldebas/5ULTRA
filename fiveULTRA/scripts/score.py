@@ -16,7 +16,7 @@ def filter_and_transform(df):
     }).fillna(df['uORF_TYPE'])
     return df
 
-def score_variants(input_file, output_file, data_dir='~/.5ULTRA/data', full_anno=False, mane=False):
+def score_variants(input_file, output_file, data_dir=os.path.join(os.path.expanduser("~"), ".5ULTRA", "data"), full_anno=False, mane=False):
     """
     Scores variants and handles pLI/LOEUF merging correctly.
     """

@@ -44,7 +44,7 @@ The **5ULTRA** pipeline filters variants that reside within the 5′ UTR region 
 ## Installation
 
 ### Prerequisites
-- Python ≥ 3.10
+- Python ≥ 2.1.0
 - [pip](https://pip.pypa.io/en/stable/)
 
 ### Steps

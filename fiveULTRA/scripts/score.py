@@ -155,6 +155,7 @@ def score_variants(input_file, output_file, data_dir=os.path.join(os.path.expand
     input_df['uORF_rank'] = input_df['uORF_rank'].apply(lambda x: 1 if pd.isna(x) else int(str(x).split('_')[0]))
     input_df['uSTOP_CODON'] = input_df['uSTOP_CODON'].apply(lambda x: 4 if pd.isna(x) else x)
     input_df['uKOZAK_STRENGTH'] = input_df['uKOZAK_STRENGTH'].apply(lambda x: 1 if pd.isna(x) else x)
+    input_df['Ribo_seq'] = input_df['Ribo_seq'].apply(lambda x: 0 if pd.isna(x) else x)
 
     feature_names = rf.feature_names_in_
     X_input = input_df[feature_names]

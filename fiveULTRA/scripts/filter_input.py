@@ -30,7 +30,6 @@ def read_bed_file(bed_file_path):
 
     for chrom in bed_by_chrom:
         bed_by_chrom[chrom].sort()
-    logging.info(f"Read BED file: {bed_file_path} with {len(bed_by_chrom)} chromosomes.")
     return bed_by_chrom
 
 

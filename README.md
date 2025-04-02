@@ -6,17 +6,16 @@
 
 ## Table of Contents
 1. [Overview](#overview)  
-2. [Features](#features)  
-3. [Installation](#installation)  
-4. [Usage](#usage)  
+2. [Installation](#installation)  
+3. [Usage](#usage)  
    - [Command-Line Options](#command-line-options)  
    - [Examples](#examples)  
-5. [Pipeline Workflow](#pipeline-workflow)  
-6. [Input and Output File Format](#input-and-output-file-format)  
-7. [Reference](#reference)  
-8. [Contributing](#contributing)  
-9. [License](#license)  
-10. [Contact](#contact)  
+4. [Pipeline Workflow](#pipeline-workflow)  
+5. [Input and Output File Format](#input-and-output-file-format)  
+6. [Reference](#reference)  
+7. [Contributing](#contributing)  
+8. [License](#license)  
+9. [Contact](#contact)  
 
 ---
 
@@ -29,15 +28,6 @@ The **5ULTRA** pipeline filters variants that reside within the 5′ UTR region 
 - Evaluates Kozak sequence disruptions.
 - Integrates optional splicing analysis through [SpliceAI](https://github.com/Illumina/SpliceAI).
 - Provides a single, interpretable score for rapid variant prioritization.
-
----
-
-## Features
-
-- **5′ UTR Filtering**: Retains only the variants that overlap with 5′ UTR regions.  
-- **uORF & Kozak Annotation**: Identifies variants affecting uORFs (start/stop gain/loss) and Kozak sequences.  
-- **Scoring**: Computes a comprehensive random forest–based score, summarizing the potential impact on translation.  
-- **Optional Splicing Integration**: Includes [SpliceAI](https://github.com/Illumina/SpliceAI) predictions when `--splice` is enabled, offering insights into splice site disruptions within the 5′ UTR.
 
 ---
 

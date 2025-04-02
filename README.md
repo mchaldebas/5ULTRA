@@ -103,12 +103,13 @@ This command uses custom data path, analyse only splicing SNVs of MANE transcrip
     - **CSQ**: Type of variant
     - **Translation**: Increased, Decreased, or N-terminal Extension
     - **5ULTRA_Score**: Prioritization metric
-    - **SpliceAI** (optional): SpliceAI scores for splicing variants that may affect 5’UTR sequence
-    - **Splicing_CSQ** (optional): Type of splicing variant
     - **GENE**: Gene Symbol
     - **TRANSCRIPT**: Ensembl transcript ID 
-
-- ***Full Annotation*** 
+- ***Splicing specific***
+when --splice is specified:
+    -SpliceAI: SpliceAI predictions for the variant.
+    -Splicing_CSQ: Missplicing consequence on the 5’UTR sequence (DG: new donor splice site used, AG new acceptor splice site used). 
+- ***Full Annotation***
 When --full is specified, additional columns are appended:
     - **MANE**: NCBI transcript ID if applicable (e.g., NM_123456789.1)
     - **5UTR_START / 5UTR_END**: Genomic coordinates of the 5′ UTR.

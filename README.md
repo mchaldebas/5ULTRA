@@ -107,8 +107,8 @@ This command uses custom data path, analyse only splicing SNVs of MANE transcrip
     - **TRANSCRIPT**: Ensembl transcript ID 
 - ***Splicing specific***
 when --splice is specified:
-    -SpliceAI: SpliceAI predictions for the variant.
-    -Splicing_CSQ: Missplicing consequence on the 5’UTR sequence (DG: new donor splice site used, AG new acceptor splice site used). 
+    - **SpliceAI**: SpliceAI predictions for the variant.
+    - **Splicing_CSQ**: Missplicing consequence on the 5’UTR sequence (DG: new donor splice site used, AG new acceptor splice site used). 
 - ***Full Annotation***
 When --full is specified, additional columns are appended:
     - **MANE**: NCBI transcript ID if applicable (e.g., NM_123456789.1)

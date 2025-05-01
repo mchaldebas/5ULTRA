@@ -57,7 +57,7 @@ def batch_process_file(input_file_path, bed_by_chrom, sep, output_file):
                     if chrom_key in bed_by_chrom:
                         regions = bed_by_chrom[chrom_key]
                         index = bisect.bisect_right(regions, (position, float('inf')))
-                        if index and regions[index - 1][0] <= position <= regions[index - 1][1]:
+                        if index and regions[index - 1][0] -4 <= position <= regions[index - 1][1] +4:
                             output_file.write(sep.join(parts) + '\n')
                 except ValueError:
                     logging.warning(f"Skipping line due to ValueError: {line.strip()}")

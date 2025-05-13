@@ -82,11 +82,11 @@ Once installed, **5ULTRA** can be run directly as a command-line tool:
 This command reads test-variants.tsv, filters for 5′ UTR variants, annotates them, calculates scores, and writes the output to test-variants.5ULTRA.tsv.
 #### Usage with all Arguments
 ```bash
-5ULTRA  -I tests/test-variants.tsv \\
-        -O tests/fully_annotated_variants.tsv \\
-        --data-dir ~/.5ULTRA/data \\
-        --splice \\
-        --mane \\
+5ULTRA  -I tests/test-variants.tsv \
+        -O tests/fully_annotated_variants.tsv \
+        --data-dir ~/.5ULTRA/data \
+        --splice \
+        --mane \
         --full
 ```
 This command uses custom data path, analyse only splicing SNVs of MANE transcripts, and produces a fully annotated output with additional columns.

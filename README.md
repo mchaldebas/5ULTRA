@@ -77,7 +77,7 @@ Once installed, **5ULTRA** can be run directly as a command-line tool:
 ### Examples
 #### Basic Usage
 ```bash
-5ULTRA tests/test-variants.tsv
+5ULTRA -I tests/test-variants.tsv
 ```
 This command reads test-variants.tsv, filters for 5′ UTR variants, annotates them, calculates scores, and writes the output to test-variants.5ULTRA.tsv.
 #### Usage with all Arguments

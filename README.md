@@ -10,12 +10,11 @@
 3. [Usage](#usage)  
    - [Command-Line Options](#command-line-options)  
    - [Examples](#examples)  
-4. [Pipeline Workflow](#pipeline-workflow)  
-5. [Input and Output File Format](#input-and-output-file-format)  
-6. [Reference](#reference)  
-7. [Contributing](#contributing)  
-8. [License](#license)  
-9. [Contact](#contact)  
+4. [Input and Output File Format](#input-and-output-file-format)  
+5. [Reference](#reference)  
+6. [Contributing](#contributing)  
+7. [License](#license)  
+8. [Contact](#contact)  
 
 ---
 
@@ -78,22 +77,19 @@ Once installed, **5ULTRA** can be run directly as a command-line tool:
 ### Examples
 #### Basic Usage
 ```bash
-5ULTRA tests/test-variants.tsv
+5ULTRA -I tests/test-variants.tsv
 ```
 This command reads test-variants.tsv, filters for 5′ UTR variants, annotates them, calculates scores, and writes the output to test-variants.5ULTRA.tsv.
 #### Usage with all Arguments
 ```bash
-5ULTRA  -I tests/test-variants.tsv \\
-        -O tests/fully_annotated_variants.tsv \\
-        --data-dir ~/.5ULTRA/data \\
-        --splice \\
-        --mane \\
+5ULTRA  -I tests/test-variants.tsv \
+        -O tests/fully_annotated_variants.tsv \
+        --data-dir ~/.5ULTRA/data \
+        --splice \
+        --mane \
         --full
 ```
 This command uses custom data path, analyse only splicing SNVs of MANE transcripts, and produces a fully annotated output with additional columns.
-## Pipeline Workflow
-
-![Picture1](https://github.com/user-attachments/assets/4fcdd53e-2b3b-4f76-a7d7-2821e133df9e)
 
 ## Input and Output File Format
 

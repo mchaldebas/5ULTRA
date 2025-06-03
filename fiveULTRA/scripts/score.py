@@ -121,8 +121,15 @@ def score_variants(input_file, output_file, data_dir=os.path.join(os.path.expand
         return True
 
     impute_columns = ['pLI', 'LOEUF', 'uSTART_PHYLOP', 'uSTART_PHASTCONS']
-    median_imputer = SimpleImputer(strategy='median')
-    input_df[impute_columns] = median_imputer.fit_transform(input_df[impute_columns])
+    specific_impute_values = {
+    'pLI': 0.5,
+    'LOEUF': 1,
+    'uSTART_PHYLOP': 0,
+    'uSTART_PHASTCONS': 0.5
+    }
+    
+    for col in impute_columns:
+        input_df[col] = input_df[col].fillna(specific_impute_values[col])
 
     columns_to_drop = ['GENE']
     input_df = input_df.drop(columns=columns_to_drop, errors='ignore')

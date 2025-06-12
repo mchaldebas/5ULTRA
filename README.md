@@ -140,7 +140,7 @@ Contributions are welcome! Please submit pull requests or open issues on the Git
 This project is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International ([CC BY-NC-ND 4.0](LICENSE)). See the LICENSE file for details.
 
 ## Contact
-> **Developer:** Matthieu Chaldebas, Ph.D. candidate
+> **Developer:** [Matthieu Chaldebas, Ph.D. candidate](https://mchaldebas.github.io)
 
 > **Email:** mchaldebas@rockefeller.edu
 

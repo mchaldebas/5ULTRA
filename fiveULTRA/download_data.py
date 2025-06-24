@@ -5,6 +5,7 @@ import logging
 import hashlib
 import shutil
 import time
+import os
 import sys
 from pathlib import Path
 
@@ -115,47 +116,48 @@ def main():
         logging.error(f"Could not read downloaded file for verification: {e}")
         sys.exit(1)
 
-
-    # --- Extraction Phase (Transactional) ---
+    # --- Extraction Phase ---
     temp_extract_dir = data_dir.with_name(data_dir.name + "_tmp")
-    
+
     try:
         logging.info(f"Extracting data to a temporary location...")
         if temp_extract_dir.exists():
-            shutil.rmtree(temp_extract_dir) # Clean up previous failed attempts
+            shutil.rmtree(temp_extract_dir)
         temp_extract_dir.mkdir()
 
         with zipfile.ZipFile(local_zip_filepath, 'r') as zip_ref:
-            zip_ref.extractall(temp_extract_dir)
+            file_list = [member.filename for member in zip_ref.infolist() if not member.is_dir()]
+            if not file_list:
+                raise ValueError("ZIP archive is empty or contains only directories.")
+
+            common_path = os.path.commonpath(file_list)
+            logging.info(f"Detected common archive path: '{common_path}'. This will be stripped.")
+
+            for member in zip_ref.infolist():
+                relative_path_str = os.path.relpath(member.filename, common_path)
+                target_path = temp_extract_dir / relative_path_str
+
+                if member.is_dir():
+                    target_path.mkdir(parents=True, exist_ok=True)
+                else:
+                    target_path.parent.mkdir(parents=True, exist_ok=True)
+                    logging.info(f"  Extracting to: {relative_path_str}")
+                    with zip_ref.open(member) as source, open(target_path, "wb") as target:
+                        shutil.copyfileobj(source, target)
         
         logging.info("Extraction successful. Moving data to final location.")
-        # Remove old data directory if it exists
         if data_dir.exists():
             shutil.rmtree(data_dir)
-        # Move new data into place
         shutil.move(str(temp_extract_dir), str(data_dir))
 
     except zipfile.BadZipFile:
         logging.error("Error: The downloaded file is not a valid ZIP archive.")
-        shutil.rmtree(temp_extract_dir, ignore_errors=True) # Clean up temp dir
+        shutil.rmtree(temp_extract_dir, ignore_errors=True)
         sys.exit(1)
     except Exception as e:
         logging.error(f"An unexpected error occurred during extraction: {e}")
-        shutil.rmtree(temp_extract_dir, ignore_errors=True) # Clean up temp dir
+        shutil.rmtree(temp_extract_dir, ignore_errors=True)
         sys.exit(1)
-    
-    # --- Cleanup Phase ---
-    if not args.no_cleanup:
-        logging.info("Cleaning up downloaded ZIP file...")
-        try:
-            local_zip_filepath.unlink()
-        except OSError as e:
-            logging.warning(f"Could not remove ZIP file: {e}")
-    else:
-        logging.info("Skipping cleanup of ZIP file as requested.")
-
-    logging.info(f"Setup complete. Data is ready in '{data_dir}'.")
-
 
 if __name__ == '__main__':
     setup_logging()

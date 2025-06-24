@@ -22,6 +22,7 @@ setup(name='fiveULTRA',
                             'joblib>=1.1.0',
                             'scikit-learn>=1.6.1',
 			                'requests',
+                            'tqdm'
         ],
         entry_points={'console_scripts': [
                         '5ULTRA=fiveULTRA.__main__:main',

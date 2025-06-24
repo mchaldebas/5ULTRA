@@ -1,6 +1,8 @@
-# 5ULTRA: A Pipeline for 5' UTR Variant Annotation and Scoring
+# 5ULTRA: A Pipeline for 5'UTR Variant Annotation and Scoring
 
-**5ULTRA** is a computational pipeline designed to annotate and score genetic variants located in the 5′ untranslated regions (5′ UTRs) of genes. By focusing on upstream open reading frames (uORFs), Kozak sequences, and optional splicing sites (via SpliceAI), it provides detailed insights into how 5′ UTR variants can affect gene regulation, translation efficiency, and disease pathogenesis.
+**5ULTRA** is a computational pipeline designed to annotate and score genetic variants located in the 5′ untranslated regions (5′UTRs) of genes. By focusing on upstream open reading frames (uORFs), Kozak sequences, and optional splicing sites (via SpliceAI), it provides detailed insights into how 5′UTR variants can affect gene regulation, translation efficiency, and disease pathogenesis.
+
+User-friendly interface: https://hgidsoft.rockefeller.edu/5ULTRA/
 
 ---
 
@@ -129,7 +131,7 @@ When --full is specified, additional columns are appended:
 
 ## Reference
 
-***Chaldebas M. et al.*** (2025). *Genome-wide detection of human 5’UTR candidate variants.*
+***Chaldebas M. et al.*** (2025). *Genome-wide detection of human 5’UTR variants that impact protein translation.*
 
 ## Contributing
 

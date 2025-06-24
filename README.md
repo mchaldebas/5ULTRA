@@ -131,7 +131,7 @@ When --full is specified, additional columns are appended:
 
 ## Reference
 
-***Chaldebas M. et al.*** (2025). *Genome-wide detection of human 5’UTR candidate variants.*
+***Chaldebas M. et al.*** (2025). *Genome-wide detection of human 5’UTR variants that impact protein translation.*
 
 ## Contributing
 

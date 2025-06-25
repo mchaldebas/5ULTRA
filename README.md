@@ -62,7 +62,7 @@ The **5ULTRA** pipeline filters variants that reside within the 5′ UTR region 
     ```
     Specify --data-dir if you wish to store reference data in a non-default location.
 
-**Note**: Ensure you have ~7 GB of available disk space to accommodate all reference data.
+**Note**: Ensure you have ~5 GB of available disk space to accommodate all reference data.
 ## Usage
 Once installed, **5ULTRA** can be run directly as a command-line tool:
 ```bash

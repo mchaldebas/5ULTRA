@@ -171,7 +171,7 @@ def process_variant(variant, utrs_by_chromosome, uorfs_by_transcript, data_dir):
     for UTR in chromosome_utrs:
         CSQ = [[], []]
         uORFAnnotations = []
-        if UTR[0] != CHR or not (int(UTR[1]) <= POS <= int(UTR[2])):
+        if UTR[0] != CHR or not (int(UTR[1])-3 <= POS <= int(UTR[2])+3):
             continue
         status = 'out'
         exons = ast.literal_eval(UTR[13])

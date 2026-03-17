@@ -21,8 +21,9 @@ setup(name='fiveULTRA',
                             'numpy>=1.18',
                             'joblib>=1.1.0',
                             'scikit-learn>=1.6.1',
-			                'requests',
-                            'tqdm'
+	                    'requests',
+                            'tqdm',
+			    'gdown'
         ],
         entry_points={'console_scripts': [
                         '5ULTRA=fiveULTRA.__main__:main',

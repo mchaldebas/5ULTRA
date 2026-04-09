@@ -23,7 +23,7 @@
 
 ## Overview
 
-The **5ULTRA** pipeline filters variants that reside within the 5′ UTR region and characterizes them for their potential impact on translation. Leveraging a machine learning model (random forest), the pipeline computes a comprehensive score, helping prioritize variants that could alter mRNA splicing or the regulation of the coding sequence (CDS).
+The **5ULTRA** pipeline filters variants that reside within the 5′ UTR region and characterizes them for their potential impact on translation. Leveraging a machine learning model (random forest), the pipeline computes a comprehensive score, helping prioritize variants that could alter mRNA splicing or the regulation of the coding sequence (CDS). 5ULTRA currently supports GRCh38 (hg38) coordinates only.
 
 **Key Highlights**:
 - Pinpoints uORF changes (e.g., gain/loss of start or stop codons).

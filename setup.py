@@ -20,7 +20,7 @@ setup(name='fiveULTRA',
                             'pandas>=1.4.4',
                             'numpy>=1.18',
                             'joblib>=1.1.0',
-                            'scikit-learn>=1.6.1',
+                            'scikit-learn==1.6.1',
 	                    'requests',
                             'tqdm',
 			    'gdown'

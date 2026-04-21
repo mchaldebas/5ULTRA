@@ -39,39 +39,50 @@ def batch_process_file(input_file_path, bed_by_chrom, sep, output_file):
     Writes matched lines directly to the output file.
     """
     open_func = gzip.open if input_file_path.endswith('.gz') else open
-    header = None
+    header_found = False
     try:
-        with open_func(input_file_path, 'rt') as f_in:
+        with open_func(input_file_path, 'rt', encoding='utf-8-sig') as f_in:
             for line in f_in:
-                if line.startswith('##'):
+                clean_line = line.strip()
+                if not clean_line:
                     continue
-                if not header:
-                    header = line.strip()
-                    output_file.write(header + '\n')
+                # Skip VCF Metadata
+                if clean_line.startswith('##'):
                     continue
+                # Identify Header (Line starting with #CHROM or first non-comment line)
+                if not header_found:
+                    if clean_line.startswith('#'):
+                        output_file.write(clean_line + '\n')
+                        header_found = True
+                        continue
+                    else:
+                        # For TSV files without # prefix
+                        output_file.write(clean_line + '\n')
+                        header_found = True
+                        continue
                 try:
-                    parts = line.rstrip('\n').split(sep, -1)
-                    chrom, position = parts[:2]
-                    position = int(position) + 1
+                    parts = clean_line.split(sep)
+                    if len(parts) < 2:
+                        continue   
+                    chrom, position = parts[0], parts[1]
+                    # Attempt to parse position
+                    pos_int = int(position) + 1
                     chrom_key = chrom[3:] if chrom.startswith('chr') else chrom
                     if chrom_key in bed_by_chrom:
                         regions = bed_by_chrom[chrom_key]
-                        index = bisect.bisect_right(regions, (position, float('inf')))
-                        if index and regions[index - 1][0] -4 <= position <= regions[index - 1][1] +4:
-                            output_file.write(sep.join(parts) + '\n')
-                except ValueError:
-                    logging.warning(f"Skipping line due to ValueError: {line.strip()}")
-                except IndexError:
-                    logging.warning(f"Skipping line due to IndexError: {line.strip()}")
-
-    except FileNotFoundError:
-        logging.error(f"Input file not found: {input_file_path}")
-        sys.exit(1)
+                        # Use bisect to find overlapping regions
+                        index = bisect.bisect_right(regions, (pos_int, float('inf')))
+                        if index > 0:
+                            start, end = regions[index - 1]
+                            if start - 4 <= pos_int <= end + 4:
+                                output_file.write(clean_line + '\n')      
+                except (ValueError, IndexError):
+                    # Only log if it's not a header-looking line we missed
+                    if not clean_line.startswith('#'):
+                        logging.warning(f"Skipping malformed data line: {clean_line[:50]}...")
     except Exception as e:
         logging.error(f"Error reading input file: {e}")
         sys.exit(1)
-
-    logging.info(f"Finished processing: {input_file_path}")
 
 
 def filter_input(input_file_path, bed_file_path, output_file_path=None):
@@ -83,20 +94,17 @@ def filter_input(input_file_path, bed_file_path, output_file_path=None):
     - bed_file_path: Path to the bed data file.
     - output_file_path: Optional path to save the filtered output.
     """
-
-    sep = ',' if input_file_path.endswith('.csv') else '\t'
+    if input_file_path.endswith('.csv'):
+        sep = ','
+    else:
+        sep = '\t'
     bed_by_chrom = read_bed_file(bed_file_path)
-
     try:
         if output_file_path:
-            with open(output_file_path, 'w') as f_out:
+            with open(output_file_path, 'w', encoding='utf-8') as f_out:
                 batch_process_file(input_file_path, bed_by_chrom, sep, f_out)
-            logging.info(f"Filtered data written to: {output_file_path}")
         else:
-            # If no output path is given, write to standard output
             batch_process_file(input_file_path, bed_by_chrom, sep, sys.stdout)
-            logging.info("Filtered data written to standard output.")
-
     except Exception as e:
         logging.error(f"Error during filtering: {e}")
         sys.exit(1)

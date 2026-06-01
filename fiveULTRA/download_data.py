@@ -26,6 +26,7 @@ def calculate_sha256(filepath: Path) -> str:
     return sha256_hash.hexdigest()
 
 def main():
+    setup_logging()
     parser = argparse.ArgumentParser(description="Download and set up 5ULTRA data.")
     default_data_dir = Path.home() / ".5ULTRA" / "data"
     parser.add_argument('--data-dir', type=Path, default=default_data_dir)
@@ -49,10 +50,9 @@ def main():
     try:
         # gdown handles the confirmation token and progress bar automatically
         gdown.download(
-            id=GOOGLE_DRIVE_FILE_ID, 
-            output=str(local_zip_filepath), 
-            quiet=False, 
-            fuzzy=True
+            id=GOOGLE_DRIVE_FILE_ID,
+            output=str(local_zip_filepath),
+            quiet=False
         )
     except Exception as e:
         logging.error(f"Download failed: {e}")

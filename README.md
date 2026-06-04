@@ -2,8 +2,9 @@
 
 **user-friendly interface**: https://hgidsoft.rockefeller.edu/5ULTRA/
 
- **precomputed scores for MANE transcripts**: https://drive.google.com/file/d/15I_w874l4W8hrJo1SpeY6U40QOZBQrP6/view?usp=share_link
- **precomputed scores for all transcripts**: https://drive.google.com/file/d/1uZHhiPxSzN0l2nDLY3BBMqIVn9-6Ng4_/view?usp=share_link
+**precomputed scores for MANE transcripts**: https://drive.google.com/file/d/15I_w874l4W8hrJo1SpeY6U40QOZBQrP6/view?usp=share_link
+
+**precomputed scores for all transcripts**: https://drive.google.com/file/d/1uZHhiPxSzN0l2nDLY3BBMqIVn9-6Ng4_/view?usp=share_link
 
 
 **5ULTRA** is a computational pipeline designed to annotate and score genetic variants located in the 5′ untranslated regions (5′UTRs) of genes. By focusing on upstream open reading frames (uORFs), Kozak sequences, and optional splicing sites (via SpliceAI), it provides detailed insights into how 5′UTR variants can affect gene regulation, translation efficiency, and disease pathogenesis.

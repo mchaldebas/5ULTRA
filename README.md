@@ -3,7 +3,6 @@
 **user-friendly interface**: https://hgidsoft.rockefeller.edu/5ULTRA/
 
 **precomputed scores for MANE transcripts**: https://drive.google.com/file/d/15I_w874l4W8hrJo1SpeY6U40QOZBQrP6/view?usp=share_link
-
 **precomputed scores for all transcripts**: https://drive.google.com/file/d/1uZHhiPxSzN0l2nDLY3BBMqIVn9-6Ng4_/view?usp=share_link
 
 
